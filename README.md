@@ -150,10 +150,10 @@ Este proyecto se desarrolla como parte del curso **Prompt Engineering para Progr
 
 El objetivo principal es practicar:
 
-- **Diseño y optimización de prompts**
-- • **Integración de IA en aplicaciones reales**
-- • **Modularización limpia**
-- • **Creación rápida de interfaces funcionales con Streamlit**
+**Diseño y optimización de prompts**
+- **Integración de IA en aplicaciones reales**
+- **Modularización limpia**
+- **Creación rápida de interfaces funcionales con Streamlit**
 
 ---
 
@@ -162,17 +162,20 @@ El proyecto está disponible bajo la licencia MIT, permitiendo su uso libre para
 Para más detalles, consulta el archivo LICENSE.
 
 ---
-## 👋 About Me
 
-Soy Vanesa Mizrahi, desarrolladora móvil iOS y analista de datos.
-Me especializo en:
+## ✋ About Me
 
-- Desarrollo móvil iOS  
-- Ciencia de Datos aplicada a negocio
-- Modelos interpretables
-- Integración con APIs externas
+Soy **Vanesa Mizrahi**, desarrolladora de software iOS y **Data Scientist en formación**.  
+Trabajo con Python, SQL y técnicas de Machine Learning para crear soluciones prácticas orientadas a negocio, incluyendo aplicaciones interactivas con **Streamlit** y flujos basados en IA generativa.
 
-### 🔗 Conecta conmigo
-- **LinkedIn:** [Vanesa Mizrahi](https://www.linkedin.com/in/vanesamizrahi)
+Me interesa especialmente:
+- Análisis exploratorio y visualización de datos  
+- Modelos de ML aplicados a problemas reales  
+- Diseño de prompts y uso de APIs de IA  
+- Desarrollo de herramientas que integren datos + experiencia de usuario  
+
+Actualmente continúo mi especialización a través de la Diplomatura en Data Science [CoderHouse](https://www.coderhouse.com/ar/diplomaturas/data/?pipe_source=google&pipe_medium=cpc&pipe_campaign=1&gad_source=1&gad_campaignid=13952864596&gbraid=0AAAAACoxfTL7S4LjLGDCtBrigIZUvaOtI&gclid=CjwKCAiAxc_JBhA2EiwAFVs7XJlquLs6YOrHV_5FBSUgw11RG-8BGH6YVHXJN2QfehgVqOBGVghiqxoCOQsQAvD_BwE).
+
+🔗 **LinkedIn:** [Vanesa Mizrahi](https://www.linkedin.com/in/vanesamizrahi)
 
 
