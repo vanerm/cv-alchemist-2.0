@@ -12,9 +12,6 @@ from src.prompts import (
 )
 
 
-# ------------------------------------------------------------
-# Función unificada para procesar uno o varios PDFs
-# ------------------------------------------------------------
 def process_uploaded_pdfs(files):
     """
     Procesa uno o varios archivos PDF subidos por el lector.
@@ -29,18 +26,18 @@ def process_uploaded_pdfs(files):
             st.error("No se recibió ningún archivo PDF para procesar.")
             return None
 
-        # Si es un único archivo UploadedFile (no lista)
+        # Caso: un solo archivo UploadedFile.
         if not isinstance(files, list):
             files.seek(0)
             text = extract_text_from_pdf(files)
         else:
+            # Lista de archivos (múltiples PDFs).
             if len(files) == 1:
                 files[0].seek(0)
                 text = extract_text_from_pdf(files[0])
             else:
                 text = extract_text_from_multiple_pdfs(files)
 
-        # Normalización
         text_clean = text.strip() if isinstance(text, str) else ""
 
         if not text_clean:
@@ -57,20 +54,19 @@ def process_uploaded_pdfs(files):
         return None
 
 
-# ------------------------------------------------------------
-# Aplicación principal
-# ------------------------------------------------------------
 def main():
     """Función principal de la aplicación CV Alchemist 2.0."""
     st.set_page_config(page_title="CV Alchemist 2.0", layout="centered")
 
-    # Manejo automático de session_state
+    # Manejo de session_state
     for key in [
         "pdf_text_raw",
         "pdf_text_clean",
         "studies_text_clean",
         "cv_master",
         "linkedin_profile",
+        "cv_target",
+        "job_description_raw",
     ]:
         if key not in st.session_state:
             st.session_state[key] = None
@@ -79,16 +75,16 @@ def main():
     st.title("CV Alchemist 2.0")
     st.subheader("Aplicación con IA para crear y optimizar CVs")
 
-    # Modo de uso
+    # Selección de modo
     option = st.radio(
         "¿Qué desea hacer?",
         ["Subir un CV existente (PDF)", "Crear CV desde cero"],
         key="mode_selection",
     )
 
-    # ==========================================================
+    # ==========================================================================
     # 🟦 OPCIÓN 1 — Subir CV existente
-    # ==========================================================
+    # ==========================================================================
     if option == "Subir un CV existente (PDF)":
 
         st.markdown("### 1) Subir CV en formato PDF")
@@ -99,22 +95,22 @@ def main():
             help="El lector puede subir aquí su CV en archivo .pdf para analizarlo.",
         )
 
-        # Procesar CV base
         if uploaded_file and st.button("Procesar PDF"):
             cleaned_text = process_uploaded_pdfs(uploaded_file)
 
             if cleaned_text:
                 st.session_state["pdf_text_raw"] = cleaned_text
                 st.session_state["pdf_text_clean"] = cleaned_text
-
-                # Reset de estados
                 st.session_state["studies_text_clean"] = None
                 st.session_state["cv_master"] = None
                 st.session_state["linkedin_profile"] = None
-
+                st.session_state["cv_target"] = None
+                st.session_state["job_description_raw"] = None
                 st.success("El PDF del CV se procesó correctamente.")
 
-        # Si ya hay un CV base procesado → permitir estudios
+        # ----------------------------------------------------------------------
+        # Subir PDFs de formación
+        # ----------------------------------------------------------------------
         if st.session_state.get("pdf_text_clean"):
 
             st.markdown("### 2) Subir nueva formación / plan de estudios (PDFs)")
@@ -137,9 +133,12 @@ def main():
                     st.session_state["studies_text_clean"] = studies_text_clean
                     st.session_state["cv_master"] = None
                     st.session_state["linkedin_profile"] = None
+                    st.session_state["cv_target"] = None
                     st.success("Los PDFs de formación se procesaron correctamente.")
 
-            # Si ya hay formación → permitir generación de CV Maestro
+            # ------------------------------------------------------------------
+            # Si ya hay formación procesada → permitir Generar CV Maestro
+            # ------------------------------------------------------------------
             if st.session_state.get("studies_text_clean"):
 
                 st.markdown("### 3) Generar CV Maestro con IA")
@@ -155,8 +154,11 @@ def main():
 
                     st.session_state["cv_master"] = cv_master
                     st.session_state["linkedin_profile"] = None
+                    st.session_state["cv_target"] = None
 
-            # Mostrar CV Maestro
+            # ------------------------------------------------------------------
+            # Mostrar CV Maestro generado
+            # ------------------------------------------------------------------
             if st.session_state.get("cv_master"):
 
                 st.markdown("### 4) Resultado: CV Maestro actualizado")
@@ -168,9 +170,9 @@ def main():
                     key="cv_master_output",
                 )
 
-                # ======================================================
-                # 🟦 Sección nueva: Generar perfil de LinkedIn
-                # ======================================================
+                # ==============================================================
+                # 🟦 Sección 5: Generar Perfil LinkedIn
+                # ==============================================================
                 st.markdown("### 5) Generar versión para LinkedIn")
 
                 if st.button("Generar Perfil LinkedIn"):
@@ -183,7 +185,6 @@ def main():
 
                     st.session_state["linkedin_profile"] = linkedin_profile
 
-                # Mostrar resultado LinkedIn
                 if st.session_state.get("linkedin_profile"):
                     st.text_area(
                         label="Perfil LinkedIn generado por IA",
@@ -192,18 +193,67 @@ def main():
                         key="linkedin_output",
                     )
 
+                # ==============================================================
+                # 🟦 Sección 6: Generar CV Target (orientado a un puesto)
+                # ==============================================================
+                st.markdown("### 6) Generar CV orientado a un puesto (CV Target)")
+
+                st.session_state["job_description_raw"] = st.text_area(
+                    label="Descripción del puesto objetivo (copiada de LinkedIn, portales de empleo, etc.)",
+                    value=st.session_state.get("job_description_raw") or "",
+                    height=220,
+                    key="job_description_input",
+                    help=(
+                        "Pegar aquí la descripción completa del puesto objetivo. "
+                        "Por ejemplo, el texto de la oferta laboral de LinkedIn."
+                    ),
+                )
+
+                if st.button("Generar CV Target"):
+                    if not st.session_state.get("cv_master"):
+                        st.warning(
+                            "Primero necesita generar un CV Maestro antes de crear un CV Target."
+                        )
+                    elif not st.session_state["job_description_raw"] or not st.session_state[
+                        "job_description_raw"
+                    ].strip():
+                        st.warning(
+                            "Para generar el CV Target, se debe pegar la descripción del puesto en el cuadro de texto."
+                        )
+                    else:
+                        # Construye el prompt para CV orientado al puesto (ATS-friendly).
+                        prompt_target = build_prompt_targeted(
+                            master_cv=st.session_state["cv_master"],
+                            job_description=st.session_state["job_description_raw"],
+                        )
+
+                        with st.spinner("Generando CV Target con IA..."):
+                            cv_target = generate_cv_output(prompt_target)
+
+                        st.session_state["cv_target"] = cv_target
+
+                if st.session_state.get("cv_target"):
+                    st.text_area(
+                        label="CV Target generado por IA",
+                        value=st.session_state["cv_target"],
+                        height=400,
+                        key="cv_target_output",
+                    )
+
         else:
             st.info(
-                "Una vez que el lector procese correctamente un PDF de CV, se habilitarán los pasos siguientes."
+                "Una vez que el lector procese correctamente un PDF de CV, "
+                "se habilitarán los pasos siguientes."
             )
 
-    # ==========================================================
+    # ==========================================================================
     # 🟦 OPCIÓN 2 — Crear CV desde cero
-    # ==========================================================
+    # ==========================================================================
     else:
         st.info("Formulario para crear un CV desde cero (pendiente de completar).")
+        # En una iteración futura se integrará get_cv_form_data() y la lógica
+        # para construir CV Maestro, Perfil LinkedIn y CV Target usando IA.
 
 
-# ------------------------------------------------------------
 if __name__ == "__main__":
     main()

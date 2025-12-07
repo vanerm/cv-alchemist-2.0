@@ -27,7 +27,7 @@ from openai import OpenAI
 load_dotenv()
 
 # Modelo por defecto. El lector puede cambiarlo vía variable de entorno.
-DEFAULT_MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+DEFAULT_MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-5.1")
 
 # Cliente global reutilizable.
 _client: Optional[OpenAI] = None
@@ -61,14 +61,11 @@ def generate_cv_output(prompt: str, model: Optional[str] = None) -> str:
 
     Parámetros:
         prompt: Instrucciones completas que describen la tarea a la IA.
-        model:  Nombre del modelo a utilizar (opcional). Si no se indica,
-                se usará DEFAULT_MODEL_NAME.
+        model: Nombre del modelo a utilizar (opcional).
+               Si no se indica, se usa DEFAULT_MODEL_NAME.
 
     Retorna:
-        Texto generado por el modelo.
-
-    En caso de error, devuelve un mensaje descriptivo para que el lector
-    pueda diagnosticar el problema.
+        Texto generado por el modelo o un mensaje de error amigable.
     """
     try:
         client = _get_openai_client()
@@ -78,23 +75,36 @@ def generate_cv_output(prompt: str, model: Optional[str] = None) -> str:
             model=model_name,
             messages=[
                 {
+                    "role": "system",
+                    "content": (
+                        "Eres un asistente experto en redacción profesional. "
+                        "Debes seguir EXACTAMENTE las instrucciones del usuario. "
+                        "No debes inventar datos, habilidades, experiencia, logros "
+                        "ni información no presente en el prompt. "
+                        "Mantén un tono profesional, claro y preciso."
+                    ),
+                },
+                {
                     "role": "user",
                     "content": prompt,
                 }
             ],
-            temperature=0.4,
+            temperature=0.1,        
+            top_p=1,
+            max_tokens=7000,
+            frequency_penalty=0,
+            presence_penalty=0
         )
 
         content = response.choices[0].message.content
         return content or "No se recibió contenido de la API de OpenAI."
 
     except Exception as e:
-        # Se devuelve un texto claro para mostrar en la interfaz.
         return (
             "⚠️ Ocurrió un error al llamar a la API de OpenAI.\n"
             f"Detalle técnico: {e}\n\n"
-            "El lector debe verificar que:\n"
-            "- La variable OPENAI_API_KEY está configurada correctamente.\n"
+            "El lector debe verificar:\n"
+            "- OPENAI_API_KEY está configurada.\n"
             "- El modelo configurado es válido.\n"
-            "- La conexión a internet está disponible."
+            "- Hay conexión a internet.\n"
         )
