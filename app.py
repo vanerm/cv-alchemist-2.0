@@ -15,23 +15,16 @@ from src.prompts import (
 def process_uploaded_pdfs(files):
     """
     Procesa uno o varios archivos PDF subidos por el lector.
-
-    - Si se recibe un único archivo, utiliza extract_text_from_pdf.
-    - Si se recibe una lista de archivos, utiliza extract_text_from_multiple_pdfs.
-    - Devuelve el texto extraído en formato string, ya normalizado.
-    - Muestra mensajes de error en pantalla y devuelve None si algo falla.
     """
     try:
         if not files:
             st.error("No se recibió ningún archivo PDF para procesar.")
             return None
 
-        # Caso: un solo archivo UploadedFile.
         if not isinstance(files, list):
             files.seek(0)
             text = extract_text_from_pdf(files)
         else:
-            # Lista de archivos (múltiples PDFs).
             if len(files) == 1:
                 files[0].seek(0)
                 text = extract_text_from_pdf(files[0])
@@ -120,12 +113,12 @@ def main():
                 type=["pdf"],
                 accept_multiple_files=True,
                 help=(
-                    "El lector puede subir aquí los PDFs de su nueva formación "
-                    "(diplomaturas, cursos, certificaciones, etc.)."
+                    "Puedes subir PDFs de formación O bien omitir este paso."
                 ),
                 key="study_files_uploader",
             )
 
+            # Procesar formación cargada
             if study_files and st.button("Procesar PDFs"):
                 studies_text_clean = process_uploaded_pdfs(study_files)
 
@@ -136,17 +129,25 @@ def main():
                     st.session_state["cv_target"] = None
                     st.success("Los PDFs de formación se procesaron correctamente.")
 
+            # Omitir formación y continuar
+            if st.button("➡️ Omitir formación y generar CV Maestro"):
+                st.session_state["studies_text_clean"] = ""
+                st.session_state["cv_master"] = None
+                st.session_state["linkedin_profile"] = None
+                st.session_state["cv_target"] = None
+                st.info("Formación omitida. Ahora puedes generar el CV Maestro.")
+
             # ------------------------------------------------------------------
-            # Si ya hay formación procesada → permitir Generar CV Maestro
+            # Generar CV Maestro si existe formación procesada O si fue omitida
             # ------------------------------------------------------------------
-            if st.session_state.get("studies_text_clean"):
+            if st.session_state.get("studies_text_clean") is not None:
 
                 st.markdown("### 3) Generar CV Maestro con IA")
 
                 if st.button("Generar CV Maestro"):
                     prompt = build_prompt_master(
                         cv_text=st.session_state["pdf_text_clean"],
-                        new_studies=st.session_state["studies_text_clean"],
+                        new_studies=st.session_state["studies_text_clean"] or "",
                     )
 
                     with st.spinner("Generando CV Maestro con IA..."):
@@ -194,19 +195,14 @@ def main():
                     )
 
                 # ==============================================================
-                # 🟦 Sección 6: Generar CV Target (orientado a un puesto)
+                # 🟦 Sección 6: Generar CV Target
                 # ==============================================================
                 st.markdown("### 6) Generar CV orientado a un puesto (CV Target)")
 
                 st.session_state["job_description_raw"] = st.text_area(
-                    label="Descripción del puesto objetivo (copiada de LinkedIn, portales de empleo, etc.)",
+                    label="Descripción del puesto objetivo",
                     value=st.session_state.get("job_description_raw") or "",
                     height=220,
-                    key="job_description_input",
-                    help=(
-                        "Pegar aquí la descripción completa del puesto objetivo. "
-                        "Por ejemplo, el texto de la oferta laboral de LinkedIn."
-                    ),
                 )
 
                 if st.button("Generar CV Target"):
@@ -214,14 +210,9 @@ def main():
                         st.warning(
                             "Primero necesita generar un CV Maestro antes de crear un CV Target."
                         )
-                    elif not st.session_state["job_description_raw"] or not st.session_state[
-                        "job_description_raw"
-                    ].strip():
-                        st.warning(
-                            "Para generar el CV Target, se debe pegar la descripción del puesto en el cuadro de texto."
-                        )
+                    elif not st.session_state["job_description_raw"].strip():
+                        st.warning("Debe pegar la descripción del puesto.")
                     else:
-                        # Construye el prompt para CV orientado al puesto (ATS-friendly).
                         prompt_target = build_prompt_targeted(
                             master_cv=st.session_state["cv_master"],
                             job_description=st.session_state["job_description_raw"],
@@ -241,18 +232,10 @@ def main():
                     )
 
         else:
-            st.info(
-                "Una vez que el lector procese correctamente un PDF de CV, "
-                "se habilitarán los pasos siguientes."
-            )
+            st.info("Una vez procesado el PDF del CV, se habilitarán los pasos siguientes.")
 
-    # ==========================================================================
-    # 🟦 OPCIÓN 2 — Crear CV desde cero
-    # ==========================================================================
     else:
         st.info("Formulario para crear un CV desde cero (pendiente de completar).")
-        # En una iteración futura se integrará get_cv_form_data() y la lógica
-        # para construir CV Maestro, Perfil LinkedIn y CV Target usando IA.
 
 
 if __name__ == "__main__":
