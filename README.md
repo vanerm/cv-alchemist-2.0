@@ -106,7 +106,7 @@ streamlit run app.py
 Este proyecto es una evolución de la primera versión del MVP desarrollada durante el curso Prompt Engineering I.
 
 Podés ver el repositorio original aquí:  
-👉 [cv-alchemist (MVP 2024)](https://github.com/vanerm/cv-alchemist)
+👉 [cv-alchemist (MVP 2025)](https://github.com/vanerm/cv-alchemist)
 
 La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y un enfoque más completo para la creación y optimización de CVs utilizando IA.
 
