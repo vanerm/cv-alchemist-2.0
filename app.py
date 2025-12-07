@@ -14,12 +14,15 @@ def main():
     # Configuración básica de la página de Streamlit.
     st.set_page_config(page_title="CV Alchemist 2.0", layout="centered")
 
-    # Inicialización de claves en session_state para almacenar el texto del CV.
+    # Inicialización de claves en session_state para almacenar el texto del CV y resultados de IA.
     if "pdf_text_raw" not in st.session_state:
         st.session_state["pdf_text_raw"] = None
 
     if "pdf_text_clean" not in st.session_state:
         st.session_state["pdf_text_clean"] = None
+
+    if "cv_master" not in st.session_state:
+        st.session_state["cv_master"] = None
 
     # Encabezado principal de la aplicación.
     st.title("CV Alchemist 2.0")
@@ -34,6 +37,8 @@ def main():
 
     # Opción 1: el lector sube un CV ya existente en formato PDF.
     if option == "Subir un CV existente (PDF)":
+        st.markdown("### 1) Subir CV en formato PDF")
+
         uploaded_file = st.file_uploader(
             "Subir CV en formato PDF",
             type=["pdf"],
@@ -62,14 +67,6 @@ def main():
 
                 st.success("El PDF se procesó correctamente.")
 
-                # Muestra una vista previa del texto procesado.
-                with st.expander("Ver texto extraído (versión limpia)"):
-                    st.text_area(
-                        label="Texto procesado",
-                        value=cleaned_text,
-                        height=300,
-                    )
-
             except PDFExtractionError as e:
                 # Muestra errores controlados de validación o extracción.
                 st.error(f"Error al procesar el PDF: {e}")
@@ -77,10 +74,63 @@ def main():
                 # Muestra cualquier error inesperado para facilitar el debug.
                 st.error(f"Error inesperado al procesar el archivo: {e}")
 
+        # Si ya hay texto de CV disponible, se habilita la sección para generar el CV Maestro.
+        if st.session_state.get("pdf_text_clean"):
+            st.markdown("### 2) Agregar nueva formación / plan de estudios")
+
+            new_studies = st.text_area(
+                label="Describa la nueva formación, cursos o plan de estudios completados",
+                value="",
+                placeholder=(
+                    "Ejemplo: Diplomatura en Data Science, CoderHouse. Contenidos: EDA, "
+                    "modelos supervisados, dashboards en Power BI, etc."
+                ),
+                height=160,
+                key="new_studies_input",
+                help=(
+                    "El lector puede pegar aquí el contenido de un plan de estudios, "
+                    "programa académico o resumen de nuevos cursos realizados."
+                ),
+            )
+
+            st.markdown("### 3) Generar CV Maestro con IA")
+
+            if st.button("Generar CV Maestro"):
+                if not new_studies.strip():
+                    st.warning(
+                        "Para generar el CV Maestro se recomienda describir la nueva formación "
+                        "en el cuadro de texto anterior."
+                    )
+                else:
+                    # Construye el prompt a partir del CV extraído y la nueva formación.
+                    prompt = build_prompt_master(
+                        cv_text=st.session_state["pdf_text_clean"],
+                        new_studies=new_studies,
+                    )
+
+                    with st.spinner("Generando CV Maestro con IA..."):
+                        cv_master = generate_cv_output(prompt)
+
+                    st.session_state["cv_master"] = cv_master
+
+            # Si ya existe un CV Maestro generado, se muestra al lector.
+            if st.session_state.get("cv_master"):
+                st.markdown("### 4) Resultado: CV Maestro actualizado")
+                st.text_area(
+                    label="CV Maestro generado por IA",
+                    value=st.session_state["cv_master"],
+                    height=400,
+                )
+        else:
+            st.info(
+                "Una vez que el lector procese correctamente un PDF, se habilitarán los "
+                "pasos para agregar nueva formación y generar el CV Maestro."
+            )
+
     # Opción 2: el lector crea un CV desde cero mediante un formulario guiado.
     else:
         st.info("Formulario para crear un CV desde cero (pendiente de completar).")
-        # En la siguiente iteración se integrará get_cv_form_data() y la lógica
+        # En una iteración posterior se integrará get_cv_form_data() y la lógica
         # para construir CV Maestro y CV Target usando IA.
 
 
