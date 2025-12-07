@@ -1,0 +1,6 @@
+streamlit
+pypdf2
+python-dotenv
+openai>=1.0.0
+pdfplumber
+langchain>=0.0.148
