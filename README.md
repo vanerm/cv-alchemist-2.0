@@ -114,6 +114,8 @@ streamlit run app.py
 - [ ] Exportar resultados descargables (**PDF / TXT**)
 - [ ] Completar formulario de **CV desde cero**
 - [ ] Mejorar estilo y diseño de la **UI de Streamlit**
+- [ ] Deploy de la app en Streamlit Community Cloud (obtener URL pública .streamlit.app)
+- [ ] Actualizar el README con el enlace a la app desplegada
 
 ---
 
