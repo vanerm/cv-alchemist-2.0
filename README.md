@@ -15,6 +15,14 @@ El proyecto forma parte del módulo **Prompt Engineering** de CoderHouse y tiene
 
 ---
 
+## 📑 Presentación del Proyecto (PPT)
+
+Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
+
+👉 [**Google Slides:**](https://docs.google.com/presentation/d/1eEIGp8-rix1Tz2_vwm3lCRcLPKQTEXyUOgclLZ90vF0/edit?usp=sharing)
+
+---
+
 ## 🛠️ Tecnologías Utilizadas
 
 - **Python 3.13**
@@ -106,13 +114,19 @@ streamlit run app.py
 ## 🧭 Roadmap / Próximos Pasos
 
 - [ ] Implementar extracción de texto con **pdfplumber**
+- [ ] Validar archivo PDF (formato, permisos, extractabilidad)
+- [ ] Manejo de errores en la extracción (mensajes claros al usuario)
 - [ ] Normalizar y limpiar el texto extraído
-- [ ] Construir prompts avanzados
+- [ ] Guardar el contenido procesado en session_state
+- [ ] Construir prompts avanzados (CV Maestro y CV Target)
 - [ ] Integrar la API de IA (**OpenAI o Gemini**)
+- [ ] Implementar funciones de IA en ai_service.py
 - [ ] Generar **CV Maestro** automáticamente
 - [ ] Generar **CV Target** según descripción de puesto
+- [ ] Diseñar interfaz para mostrar CV generado y permitir descarga
 - [ ] Exportar resultados descargables (**PDF / TXT**)
 - [ ] Completar formulario de **CV desde cero**
+- [ ] Unificar datos del PDF + formulario
 - [ ] Mejorar estilo y diseño de la **UI de Streamlit**
 - [ ] Deploy de la app en Streamlit Community Cloud (obtener URL pública .streamlit.app)
 - [ ] Actualizar el README con el enlace a la app desplegada
