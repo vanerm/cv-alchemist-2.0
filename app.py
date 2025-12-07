@@ -5,9 +5,16 @@ from src.extract_pdf import (
 )
 from src.form_helpers import get_cv_form_data
 from src.ai_service import generate_cv_output
-from src.prompts import build_prompt_master, build_prompt_targeted
+from src.prompts import (
+    build_prompt_master,
+    build_prompt_targeted,
+    build_prompt_linkedin_profile,
+)
 
 
+# ------------------------------------------------------------
+# Función unificada para procesar uno o varios PDFs
+# ------------------------------------------------------------
 def process_uploaded_pdfs(files):
     """
     Procesa uno o varios archivos PDF subidos por el lector.
@@ -18,25 +25,22 @@ def process_uploaded_pdfs(files):
     - Muestra mensajes de error en pantalla y devuelve None si algo falla.
     """
     try:
-        # Caso: no se recibió nada.
         if not files:
             st.error("No se recibió ningún archivo PDF para procesar.")
             return None
 
-        # Caso: un solo archivo UploadedFile.
+        # Si es un único archivo UploadedFile (no lista)
         if not isinstance(files, list):
             files.seek(0)
             text = extract_text_from_pdf(files)
         else:
-            # Lista de archivos (múltiples PDFs).
-            # Si la lista tiene un solo elemento, también se puede reutilizar la función general.
             if len(files) == 1:
                 files[0].seek(0)
                 text = extract_text_from_pdf(files[0])
             else:
                 text = extract_text_from_multiple_pdfs(files)
 
-        # Normaliza el texto a un string limpio.
+        # Normalización
         text_clean = text.strip() if isinstance(text, str) else ""
 
         if not text_clean:
@@ -53,47 +57,40 @@ def process_uploaded_pdfs(files):
         return None
 
 
+# ------------------------------------------------------------
+# Aplicación principal
+# ------------------------------------------------------------
 def main():
-    """
-    Función principal de la aplicación CV Alchemist 2.0.
-
-    Permite:
-    - Subir un CV base en PDF.
-    - Subir uno o varios PDFs de nueva formación o plan de estudios.
-    - Procesar ambos tipos de documentos.
-    - Generar un CV Maestro actualizado mediante IA.
-    """
-    # Configuración básica de la página de Streamlit.
+    """Función principal de la aplicación CV Alchemist 2.0."""
     st.set_page_config(page_title="CV Alchemist 2.0", layout="centered")
 
-    # Inicialización de claves en session_state para almacenar texto de entrada y resultados.
-    if "pdf_text_raw" not in st.session_state:
-        st.session_state["pdf_text_raw"] = None
+    # Manejo automático de session_state
+    for key in [
+        "pdf_text_raw",
+        "pdf_text_clean",
+        "studies_text_clean",
+        "cv_master",
+        "linkedin_profile",
+    ]:
+        if key not in st.session_state:
+            st.session_state[key] = None
 
-    if "pdf_text_clean" not in st.session_state:
-        st.session_state["pdf_text_clean"] = None
-
-    if "studies_text_clean" not in st.session_state:
-        st.session_state["studies_text_clean"] = None
-
-    if "cv_master" not in st.session_state:
-        st.session_state["cv_master"] = None
-
-    # Encabezado principal.
+    # Encabezado
     st.title("CV Alchemist 2.0")
     st.subheader("Aplicación con IA para crear y optimizar CVs")
 
-    # Selección del modo de uso.
+    # Modo de uso
     option = st.radio(
         "¿Qué desea hacer?",
         ["Subir un CV existente (PDF)", "Crear CV desde cero"],
         key="mode_selection",
     )
 
-    # --------------------------------------------------------------------------
-    # 🟦 OPCIÓN 1 — Subir CV existente en PDF
-    # --------------------------------------------------------------------------
+    # ==========================================================
+    # 🟦 OPCIÓN 1 — Subir CV existente
+    # ==========================================================
     if option == "Subir un CV existente (PDF)":
+
         st.markdown("### 1) Subir CV en formato PDF")
 
         uploaded_file = st.file_uploader(
@@ -102,25 +99,24 @@ def main():
             help="El lector puede subir aquí su CV en archivo .pdf para analizarlo.",
         )
 
-        # Botón para procesar el CV base.
+        # Procesar CV base
         if uploaded_file and st.button("Procesar PDF"):
             cleaned_text = process_uploaded_pdfs(uploaded_file)
 
             if cleaned_text:
-                # Guarda el texto del CV base en session_state.
                 st.session_state["pdf_text_raw"] = cleaned_text
                 st.session_state["pdf_text_clean"] = cleaned_text
 
-                # Reinicia estados previos relacionados con formación y CV Maestro.
+                # Reset de estados
                 st.session_state["studies_text_clean"] = None
                 st.session_state["cv_master"] = None
+                st.session_state["linkedin_profile"] = None
 
                 st.success("El PDF del CV se procesó correctamente.")
 
-        # ----------------------------------------------------------------------
-        # 🟦 Si ya existe un CV base procesado → permitir subir PDFs de estudios
-        # ----------------------------------------------------------------------
+        # Si ya hay un CV base procesado → permitir estudios
         if st.session_state.get("pdf_text_clean"):
+
             st.markdown("### 2) Subir nueva formación / plan de estudios (PDFs)")
 
             study_files = st.file_uploader(
@@ -129,67 +125,85 @@ def main():
                 accept_multiple_files=True,
                 help=(
                     "El lector puede subir aquí los PDFs de su nueva formación "
-                    "(diplomaturas, cursos, certificaciones, programas académicos, etc.)."
+                    "(diplomaturas, cursos, certificaciones, etc.)."
                 ),
                 key="study_files_uploader",
             )
 
-            # Botón para procesar los PDFs de formación.
             if study_files and st.button("Procesar PDFs"):
                 studies_text_clean = process_uploaded_pdfs(study_files)
 
                 if studies_text_clean:
                     st.session_state["studies_text_clean"] = studies_text_clean
                     st.session_state["cv_master"] = None
-
+                    st.session_state["linkedin_profile"] = None
                     st.success("Los PDFs de formación se procesaron correctamente.")
 
-            # ------------------------------------------------------------------
-            # 🟦 Solo mostrar el botón de IA si ya se procesaron los estudios
-            # ------------------------------------------------------------------
+            # Si ya hay formación → permitir generación de CV Maestro
             if st.session_state.get("studies_text_clean"):
+
                 st.markdown("### 3) Generar CV Maestro con IA")
 
                 if st.button("Generar CV Maestro"):
-                    # Construye el prompt combinado con CV base y nueva formación.
                     prompt = build_prompt_master(
                         cv_text=st.session_state["pdf_text_clean"],
                         new_studies=st.session_state["studies_text_clean"],
                     )
 
-                    # Genera el CV Maestro mediante IA.
                     with st.spinner("Generando CV Maestro con IA..."):
                         cv_master = generate_cv_output(prompt)
 
                     st.session_state["cv_master"] = cv_master
+                    st.session_state["linkedin_profile"] = None
 
-            # ------------------------------------------------------------------
-            # 🟦 Mostrar resultado final (si existe)
-            # ------------------------------------------------------------------
+            # Mostrar CV Maestro
             if st.session_state.get("cv_master"):
+
                 st.markdown("### 4) Resultado: CV Maestro actualizado")
+
                 st.text_area(
                     label="CV Maestro generado por IA",
                     value=st.session_state["cv_master"],
                     height=400,
+                    key="cv_master_output",
                 )
 
+                # ======================================================
+                # 🟦 Sección nueva: Generar perfil de LinkedIn
+                # ======================================================
+                st.markdown("### 5) Generar versión para LinkedIn")
+
+                if st.button("Generar Perfil LinkedIn"):
+                    prompt_linkedin = build_prompt_linkedin_profile(
+                        master_cv=st.session_state["cv_master"]
+                    )
+
+                    with st.spinner("Generando perfil LinkedIn con IA..."):
+                        linkedin_profile = generate_cv_output(prompt_linkedin)
+
+                    st.session_state["linkedin_profile"] = linkedin_profile
+
+                # Mostrar resultado LinkedIn
+                if st.session_state.get("linkedin_profile"):
+                    st.text_area(
+                        label="Perfil LinkedIn generado por IA",
+                        value=st.session_state["linkedin_profile"],
+                        height=350,
+                        key="linkedin_output",
+                    )
+
         else:
-            # Aún no se procesó un CV base.
             st.info(
-                "Una vez que el lector procese correctamente un PDF de CV, se habilitarán los "
-                "pasos para subir la nueva formación en PDF y generar el CV Maestro."
+                "Una vez que el lector procese correctamente un PDF de CV, se habilitarán los pasos siguientes."
             )
 
-    # --------------------------------------------------------------------------
+    # ==========================================================
     # 🟦 OPCIÓN 2 — Crear CV desde cero
-    # --------------------------------------------------------------------------
+    # ==========================================================
     else:
         st.info("Formulario para crear un CV desde cero (pendiente de completar).")
-        # En una iteración futura se integrará get_cv_form_data() y la lógica
-        # para construir CV Maestro y CV Target usando IA.
 
 
-# ----------------------------------------------------------------------
+# ------------------------------------------------------------
 if __name__ == "__main__":
     main()
