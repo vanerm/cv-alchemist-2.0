@@ -394,7 +394,13 @@ def main():
                     st.session_state["cv_master"] = None
                     st.session_state["linkedin_profile"] = None
                     st.session_state["cv_target"] = None
-                    st.success("Los PDFs de formación se procesaron correctamente.")
+                    st.session_state["show_success_studies"] = True
+                    st.rerun()
+            
+            # Mostrar mensaje de éxito después del rerun
+            if st.session_state.get("show_success_studies"):
+                st.success("Los PDFs de formación se procesaron correctamente.")
+                st.session_state["show_success_studies"] = False
 
             # Omitir formación y continuar (solo si no hay formación procesada)
             has_studies = st.session_state.get("studies_text_clean") not in [None, ""]
@@ -408,7 +414,13 @@ def main():
                 st.session_state["cv_master"] = None
                 st.session_state["linkedin_profile"] = None
                 st.session_state["cv_target"] = None
+                st.session_state["show_info_skip"] = True
+                st.rerun()
+            
+            # Mostrar mensaje después del rerun
+            if st.session_state.get("show_info_skip"):
                 st.info("Formación omitida. Ahora puedes generar el CV Maestro.")
+                st.session_state["show_info_skip"] = False
 
             # ------------------------------------------------------------------
             # Generar CV Maestro si existe formación procesada O si fue omitida

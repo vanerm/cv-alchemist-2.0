@@ -26,21 +26,38 @@ def create_sidebar():
         # Progress Tracker
         st.markdown("### 📍 Progreso")
         
-        steps = {
-            "1️⃣ Cargar/Crear CV": st.session_state.get("pdf_text_clean") is not None,
-            "2️⃣ CV Maestro": st.session_state.get("cv_master") is not None,
-            "3️⃣ Perfil LinkedIn": st.session_state.get("linkedin_profile") is not None,
-            "4️⃣ CV Target": st.session_state.get("cv_target") is not None,
-            "5️⃣ Análisis ATS": st.session_state.get("ats_analysis") is not None or st.session_state.get("ats_analysis_form") is not None,
-        }
+        # Verificar estado de formación
+        studies_state = st.session_state.get("studies_text_clean")
+        has_training_content = studies_state is not None and studies_state != ""
+        training_skipped = studies_state == ""
         
-        for step, completed in steps.items():
-            icon = "✅" if completed else "⭕"
-            color = "#27AE60" if completed else "#6c757d"
-            weight = "600" if completed else "500"
+        # Definir pasos con estados especiales
+        steps = [
+            ("1️⃣ Cargar/Crear CV", st.session_state.get("pdf_text_clean") is not None, False),
+            ("2️⃣ Formación (opcional)", has_training_content, training_skipped),
+            ("3️⃣ CV Maestro", st.session_state.get("cv_master") is not None, False),
+            ("4️⃣ Perfil LinkedIn", st.session_state.get("linkedin_profile") is not None, False),
+            ("5️⃣ CV Target", st.session_state.get("cv_target") is not None, False),
+            ("6️⃣ Análisis ATS", st.session_state.get("ats_analysis") is not None or st.session_state.get("ats_analysis_form") is not None, False),
+        ]
+        
+        for step_name, completed, skipped in steps:
+            if completed:
+                icon = "✅"
+                color = "#27AE60"
+                weight = "600"
+            elif skipped:
+                icon = "➖"  # Guion/menos
+                color = "#F39C12"  # Naranja/amarillo
+                weight = "600"
+            else:
+                icon = "⭕"
+                color = "#6c757d"
+                weight = "500"
+            
             st.markdown(f"""
                 <div style="padding: 0.5rem 0; color: {color}; font-weight: {weight};">
-                    {icon} {step}
+                    {icon} {step_name}
                 </div>
             """, unsafe_allow_html=True)
         

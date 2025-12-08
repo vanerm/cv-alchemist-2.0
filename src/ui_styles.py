@@ -207,6 +207,13 @@ def apply_custom_styles():
             font-weight: 600;
         }
         
+        /* Icono de ayuda en métricas - mejor contraste */
+        [data-testid="stMetric"] [data-testid="stTooltipIcon"],
+        [data-testid="stMetric"] svg {
+            color: #667eea !important;
+            fill: #667eea !important;
+        }
+        
         /* ========== Alertas Personalizadas ========== */
         .stAlert {
             border-radius: 8px;
