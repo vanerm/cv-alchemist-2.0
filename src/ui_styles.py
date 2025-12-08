@@ -307,6 +307,58 @@ def apply_custom_styles():
             color: #6c757d !important;
         }
         
+        /* Botón de borrar archivo (cruz X) - color por defecto gris oscuro */
+        [data-testid="stFileUploader"] button[kind="icon"],
+        [data-testid="stFileUploader"] button[aria-label*="Remove"],
+        [data-testid="stFileUploader"] button[aria-label*="Delete"],
+        [data-testid="stFileUploader"] button svg {
+            color: #495057 !important;
+            fill: #495057 !important;
+        }
+        
+        /* Botón de borrar en hover - rojo */
+        [data-testid="stFileUploader"] button[kind="icon"]:hover,
+        [data-testid="stFileUploader"] button[aria-label*="Remove"]:hover,
+        [data-testid="stFileUploader"] button[aria-label*="Delete"]:hover,
+        [data-testid="stFileUploader"] button:hover svg {
+            color: #E74C3C !important;
+            fill: #E74C3C !important;
+        }
+        
+        /* Flechas de navegación < y > - color por defecto gris oscuro */
+        [data-testid="stFileUploader"] button[data-testid*="nav"],
+        [data-testid="stFileUploader"] button[aria-label*="Previous"],
+        [data-testid="stFileUploader"] button[aria-label*="Next"],
+        [data-testid="stFileUploader"] button[aria-label*="Anterior"],
+        [data-testid="stFileUploader"] button[aria-label*="Siguiente"] {
+            color: #495057 !important;
+        }
+        
+        [data-testid="stFileUploader"] button[data-testid*="nav"] svg,
+        [data-testid="stFileUploader"] button[aria-label*="Previous"] svg,
+        [data-testid="stFileUploader"] button[aria-label*="Next"] svg,
+        [data-testid="stFileUploader"] button[aria-label*="Anterior"] svg,
+        [data-testid="stFileUploader"] button[aria-label*="Siguiente"] svg {
+            fill: #495057 !important;
+        }
+        
+        /* Flechas de navegación en hover - rojo */
+        [data-testid="stFileUploader"] button[data-testid*="nav"]:hover,
+        [data-testid="stFileUploader"] button[aria-label*="Previous"]:hover,
+        [data-testid="stFileUploader"] button[aria-label*="Next"]:hover,
+        [data-testid="stFileUploader"] button[aria-label*="Anterior"]:hover,
+        [data-testid="stFileUploader"] button[aria-label*="Siguiente"]:hover {
+            color: #E74C3C !important;
+        }
+        
+        [data-testid="stFileUploader"] button[data-testid*="nav"]:hover svg,
+        [data-testid="stFileUploader"] button[aria-label*="Previous"]:hover svg,
+        [data-testid="stFileUploader"] button[aria-label*="Next"]:hover svg,
+        [data-testid="stFileUploader"] button[aria-label*="Anterior"]:hover svg,
+        [data-testid="stFileUploader"] button[aria-label*="Siguiente"]:hover svg {
+            fill: #E74C3C !important;
+        }
+        
         /* ========== Selectbox Mejorado ========== */
         .stSelectbox > div > div {
             border-radius: 8px;
