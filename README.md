@@ -8,11 +8,13 @@ Aplicación web con IA desarrollada con **Streamlit** para crear, analizar y opt
 CV Alchemist 2.0 es una aplicación interactiva que permite:
 
 - **Subir un CV existente** en formato PDF para analizarlo y extraer su contenido.  
-- **Crear un CV desde cero** mediante un formulario dinámico con campos de fecha inteligentes.  
+- **Crear un CV desde cero** mediante un formulario dinámico con validación de datos.  
 - **Generar un CV Maestro** actualizado integrando nueva formación con IA.  
 - **Crear un Perfil de LinkedIn** optimizado a partir del CV Maestro.  
 - **Generar un CV Target** personalizado para un puesto específico.  
+- **Seleccionar modelo de IA** (OpenAI o Gemini) con fallback automático.
 - **Analizar compatibilidad ATS** del CV generado con scoring y recomendaciones.
+- **Elegir templates profesionales** para personalizar el diseño del PDF.
 - **Descargar en PDF** todos los documentos generados (CV Maestro, LinkedIn, CV Target).
 
 El proyecto forma parte del módulo **Prompt Engineering** de CoderHouse y tiene como objetivo aplicar buenas prácticas de diseño de prompts en una aplicación funcional en Python.
@@ -130,24 +132,48 @@ streamlit run app.py
 ## ✨ Funcionalidades Principales
 
 ### 📄 Opción 1: Subir CV Existente
-1. **Carga de PDF**: Sube tu CV actual en formato PDF
+1. **Carga de PDF**: Sube tu CV actual en formato PDF con validación avanzada
 2. **Extracción de texto**: Procesamiento automático con pdfplumber
 3. **Agregar formación**: Opcionalmente sube PDFs de nuevos cursos/certificaciones
 4. **Generar CV Maestro**: IA integra la nueva formación manteniendo tu experiencia
 5. **Crear Perfil LinkedIn**: Genera contenido optimizado para LinkedIn
 6. **CV Target**: Personaliza tu CV para un puesto específico
 7. **Análisis ATS**: Evalúa compatibilidad con sistemas de filtrado automático
-8. **Descargar PDF**: Exporta cualquier documento generado
+8. **Descargar PDF**: Exporta cualquier documento con el template elegido
 
 ### 📝 Opción 2: Crear CV desde Cero
-1. **Formulario dinámico**: Completa tus datos personales
+1. **Formulario dinámico**: Completa tus datos personales con validación en tiempo real
 2. **Experiencia profesional**: Agrega hasta 10 empleos con fechas inteligentes
 3. **Educación**: Incluye hasta 10 estudios con opción "En curso"
-4. **Proyectos**: Destaca hasta 10 proyectos relevantes
+4. **Proyectos**: Destaca hasta 10 proyectos relevantes con enlaces
 5. **Habilidades**: Lista tus competencias técnicas y blandas
-6. **Generación con IA**: Crea CV Maestro, LinkedIn y CV Target
-7. **Análisis ATS**: Score y recomendaciones para optimizar tu CV
-8. **Exportación PDF**: Descarga todos los documentos generados
+6. **Validación de datos**: Regex para email, teléfono, URLs y sanitización de texto
+7. **Generación con IA**: Crea CV Maestro, LinkedIn y CV Target
+8. **Análisis ATS**: Score y recomendaciones para optimizar tu CV
+9. **Exportación PDF**: Descarga todos los documentos generados
+
+### 🤖 Selección de Modelo de IA
+- **Selector en sidebar**: Elige entre OpenAI, Gemini o modo Auto
+- **Múltiples modelos OpenAI**: gpt-4o-mini, gpt-4o, gpt-4-turbo-preview, gpt-3.5-turbo
+- **Múltiples modelos Gemini**: gemini-flash-latest, gemini-2.5-flash, gemini-2.5-pro, gemini-pro-latest
+- **Fallback automático**: Si OpenAI falla, usa Gemini automáticamente
+- **Mensajes dinámicos**: El spinner muestra el modelo específico en uso
+- **Logs de debugging**: Seguimiento detallado en consola
+
+### 🎨 Templates Profesionales
+- **Clásico**: Formato tradicional (ATS ⭐⭐⭐⭐⭐) - Ideal para Legal, Finanzas
+- **Moderno**: Balance diseño/parseabilidad (ATS ⭐⭐⭐⭐) - Ideal para Tech, Startups
+- **Minimalista**: Espaciado generoso (ATS ⭐⭐⭐⭐) - Ideal para Diseño, UX/UI
+- **Creativo**: Más visual (ATS ⭐⭐⭐) - Ideal para Marketing, Publicidad
+- **Personalización**: Tipografía, colores, iconos y layout profesional
+
+### 🔍 Análisis ATS Avanzado
+- **Scoring 0-100**: Evaluación cuantitativa de compatibilidad
+- **4 Criterios**: Formato (25%), Palabras clave (40%), Contenido (20%), Optimización (15%)
+- **Palabras clave**: Identificación de términos encontrados y faltantes
+- **Fortalezas y debilidades**: Análisis detallado por categoría
+- **Recomendaciones accionables**: Sugerencias específicas para mejorar
+- **Detalles por criterio**: Información expandible para cada métrica
 
 ### 🤖 Prompts Inteligentes
 - **Prompt Maestro**: Integra nueva formación sin inventar experiencia
@@ -155,6 +181,23 @@ streamlit run app.py
 - **Prompt LinkedIn**: Genera perfil profesional optimizado
 - **Prompt ATS**: Analiza compatibilidad con sistemas de reclutamiento
 - **Anti-alucinaciones**: Reglas estrictas para mantener veracidad
+
+### 🛡️ Seguridad y Validación
+- **Validación de email**: Regex para formato válido con @ y dominio
+- **Validación de teléfono**: Solo números, +, -, ( ) con longitud mínima/máxima
+- **Validación de URLs**: Formato http/https con dominio válido
+- **Validación de nombres**: Solo letras, espacios, acentos, apóstrofes y guiones
+- **Sanitización de texto**: Remoción de caracteres de control y peligrosos
+- **Validación de PDFs**: Tamaño, tipo, protección y contenido legible
+- **Mensajes de error detallados**: Feedback específico para cada campo
+
+### 🎨 Interfaz de Usuario
+- **Sidebar interactivo**: Progreso, estadísticas, selección de modelo
+- **Tema lila pastel**: Diseño consistente y profesional
+- **Indicadores de progreso**: Checkmarks verdes para pasos completados
+- **Botón reiniciar**: Limpia sesión sin recargar página
+- **Mensajes contextuales**: Success, info, warning y error con iconos
+- **Responsive**: Adaptable a diferentes tamaños de pantalla
 
 ---
 
@@ -186,26 +229,26 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Diseño visual profesional de PDFs (tipografía, colores, iconos, layout)
 - [x] Templates personalizables (Clásico, Moderno, Minimalista, Creativo)
 - [x] Análisis ATS con scoring, palabras clave y recomendaciones
+- [x] Selector de modelo de IA en sidebar (OpenAI/Gemini/Auto)
+- [x] Múltiples modelos disponibles por proveedor
+- [x] Validación de formulario con regex (email, teléfono, URLs)
+- [x] Sanitización de inputs para prevenir inyección de código
+- [x] Mensajes de spinner dinámicos mostrando modelo en uso
+- [x] Sidebar con indicadores de progreso y estadísticas
+- [x] Botón reiniciar para limpiar sesión
+- [x] Tema visual consistente (lila pastel) en toda la UI
+- [x] Script de prueba de APIs (test_apis.py)
 
 ---
 
 ## 🧭 Roadmap / Próximos Pasos
 
-- [x] Implementar extracción de texto con **pdfplumber**
-- [x] Construir prompts avanzados (CV Maestro, Target y LinkedIn)
-- [x] Integrar la API de IA (**OpenAI**)
-- [x] Generar **CV Maestro** automáticamente
-- [x] Generar **CV Target** según descripción de puesto
-- [x] Generar **Perfil LinkedIn** optimizado
-- [x] Exportar resultados descargables en **PDF**
-- [x] Completar formulario de **CV desde cero** con campos dinámicos
-- [x] Implementar campos de fecha con opción "Actualidad/En curso"
-- [x] Validación avanzada de archivos PDF
-- [x] Mejorar diseño visual de PDFs generados
-- [x] Agregar templates de CV personalizables
-- [x] Implementar análisis ATS del CV generado
-- [x] Mejorar estilo y diseño de la **UI de Streamlit**
 - [ ] Deploy de la app en Streamlit Community Cloud
+- [ ] Agregar soporte para más idiomas (inglés, portugués)
+- [ ] Implementar historial de CVs generados
+- [ ] Agregar exportación en formato Word (.docx)
+- [ ] Integrar más modelos de IA (Claude, Llama)
+- [ ] Crear sistema de plantillas personalizadas por usuario
 
 ---
 
