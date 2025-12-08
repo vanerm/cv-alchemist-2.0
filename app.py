@@ -431,6 +431,24 @@ def main():
     else:
         st.markdown("### 1) Completar formulario para crear CV base")
 
+        # Definir listas de países y ciudades para reutilizar
+        paises = [
+            "Argentina", "Bolivia", "Chile", "Colombia", "Costa Rica",
+            "Ecuador", "España", "Guatemala", "México", "Panamá",
+            "Paraguay", "Perú", "Uruguay", "Venezuela", "Otro"
+        ]
+        
+        ciudades_por_pais = {
+            "Argentina": ["Buenos Aires", "Córdoba", "La Plata", "Mendoza", "Rosario", "Otra"],
+            "México": ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Tijuana", "Otra"],
+            "Colombia": ["Barranquilla", "Bogotá", "Cali", "Cartagena", "Medellín", "Otra"],
+            "Chile": ["Antofagasta", "Concepción", "La Serena", "Santiago", "Valparaíso", "Otra"],
+            "Perú": ["Arequipa", "Chiclayo", "Cusco", "Lima", "Trujillo", "Otra"],
+            "España": ["Barcelona", "Bilbao", "Madrid", "Sevilla", "Valencia", "Otra"],
+            "Uruguay": ["Maldonado", "Montevideo", "Paysandú", "Rivera", "Salto", "Otra"],
+            "Otro": ["Especificar manualmente"]
+        }
+
         # ----------------- Datos personales -----------------
         st.markdown("#### Datos personales")
 
@@ -455,17 +473,25 @@ def main():
                 "Titular profesional",
                 placeholder="Ej: Analista de Datos Jr | Contador Público",
             )
-            location = st.text_input(
-                "Ubicación",
-                placeholder="Ciudad, País",
-            )
+            
+            pais = st.selectbox("País", paises, key="pais_select")
+            
+            if pais in ciudades_por_pais:
+                ciudad = st.selectbox("Ciudad", ciudades_por_pais[pais], key="ciudad_select")
+            else:
+                ciudad = st.selectbox("Ciudad", ["Capital", "Otra"], key="ciudad_select_default")
+            
+            if ciudad in ["Otra", "Especificar manualmente"]:
+                ciudad = st.text_input("Especificar ciudad", key="ciudad_manual")
+            
+            location = f"{ciudad}, {pais}" if ciudad and pais else ""
 
         summary = st.text_area(
             "Resumen profesional (opcional)",
             placeholder="Resume tu perfil en 3–4 líneas: experiencia principal, fortalezas y objetivo.",
             height=120,
         )
-
+        
         # ----------------- Experiencia -----------------
         st.markdown("#### Experiencia profesional")
         n_exp = st.number_input(
@@ -489,11 +515,32 @@ def main():
                 key=f"company_{i}",
                 placeholder="Ej: Mercado Libre",
             )
-            location_job = st.text_input(
-                f"Ubicación empleo {i+1}",
-                key=f"location_job_{i}",
-                placeholder="Ciudad, País",
-            )
+            # Ubicación del empleo con selectboxes
+            col_pais, col_ciudad = st.columns(2)
+            with col_pais:
+                pais_job = st.selectbox(
+                    f"País {i+1}",
+                    paises,
+                    key=f"pais_job_{i}",
+                )
+            with col_ciudad:
+                if pais_job in ciudades_por_pais:
+                    ciudad_job = st.selectbox(
+                        f"Ciudad {i+1}",
+                        ciudades_por_pais[pais_job],
+                        key=f"ciudad_job_{i}",
+                    )
+                else:
+                    ciudad_job = st.selectbox(
+                        f"Ciudad {i+1}",
+                        ["Capital", "Otra"],
+                        key=f"ciudad_job_{i}",
+                    )
+            
+            if ciudad_job in ["Otra", "Especificar manualmente"]:
+                ciudad_job = st.text_input(f"Especificar ciudad {i+1}", key=f"ciudad_job_manual_{i}")
+            
+            location_job = f"{ciudad_job}, {pais_job}" if ciudad_job and pais_job else ""
             
             col_d1, col_d2, col_d3 = st.columns([1, 1, 1])
             with col_d3:

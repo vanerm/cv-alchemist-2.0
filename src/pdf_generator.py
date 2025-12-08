@@ -84,12 +84,27 @@ def generate_pdf(content: str, title: str = "CV") -> bytes:
             story.append(para)
         else:
             # Texto normal
-            # Escapar caracteres especiales primero
-            text = line.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-            
-            # Reemplazar markdown bold correctamente
             import re
-            text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
+            
+            # Primero extraer contenido bold y escaparlo
+            def escape_bold_content(match):
+                content = match.group(1)
+                # Escapar caracteres especiales dentro del bold
+                content = content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                return f'<b>{content}</b>'
+            
+            # Reemplazar bold con contenido escapado
+            text = re.sub(r'\*\*(.+?)\*\*', escape_bold_content, line)
+            
+            # Escapar el resto del texto (fuera de los tags <b>)
+            parts = re.split(r'(<b>.*?</b>)', text)
+            escaped_parts = []
+            for part in parts:
+                if part.startswith('<b>') and part.endswith('</b>'):
+                    escaped_parts.append(part)
+                else:
+                    escaped_parts.append(part.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;'))
+            text = ''.join(escaped_parts)
             
             para = Paragraph(text, styles['CustomBody'])
             story.append(para)
