@@ -15,7 +15,7 @@ from src.pdf_generator import generate_pdf
 
 def process_uploaded_pdfs(files):
     """
-    Procesa uno o varios archivos PDF subidos por el lector.
+    Procesa uno o varios archivos PDF subidos por el lector con validación avanzada.
     """
     try:
         if not files:
@@ -24,15 +24,66 @@ def process_uploaded_pdfs(files):
 
         # Un solo archivo
         if not isinstance(files, list):
-            files.seek(0)
-            text = extract_text_from_pdf(files)
+            text, validation = extract_text_from_pdf(files, validate=True)
+            
+            # Mostrar errores de validación
+            if not validation.is_valid:
+                st.error(f"❌ {validation.error_message}")
+                return None
+            
+            # Mostrar advertencias si existen
+            if validation.warning_message:
+                st.warning(validation.warning_message)
+            
+            # Mostrar metadata
+            if validation.metadata:
+                meta = validation.metadata
+                st.info(
+                    f"📄 **PDF procesado:** {meta.get('num_pages', 0)} página(s) | "
+                    f"{meta.get('text_length', 0)} caracteres extraídos | "
+                    f"{meta.get('file_size_mb', 0)}MB"
+                )
         else:
             # Lista de archivos
             if len(files) == 1:
-                files[0].seek(0)
-                text = extract_text_from_pdf(files[0])
+                text, validation = extract_text_from_pdf(files[0], validate=True)
+                
+                if not validation.is_valid:
+                    st.error(f"❌ {validation.error_message}")
+                    return None
+                
+                if validation.warning_message:
+                    st.warning(validation.warning_message)
+                
+                if validation.metadata:
+                    meta = validation.metadata
+                    st.info(
+                        f"📄 **PDF procesado:** {meta.get('num_pages', 0)} página(s) | "
+                        f"{meta.get('text_length', 0)} caracteres extraídos | "
+                        f"{meta.get('file_size_mb', 0)}MB"
+                    )
             else:
-                text = extract_text_from_multiple_pdfs(files)
+                text, validations = extract_text_from_multiple_pdfs(files, validate=True)
+                
+                # Verificar si hay errores
+                errors = [v for v in validations if v and not v.is_valid]
+                if errors:
+                    for i, error in enumerate(errors):
+                        st.error(f"❌ Archivo {i+1}: {error.error_message}")
+                    return None
+                
+                # Mostrar advertencias
+                warnings = [v for v in validations if v and v.warning_message]
+                for warning in warnings:
+                    st.warning(warning.warning_message)
+                
+                # Mostrar metadata consolidada
+                total_pages = sum(v.metadata.get('num_pages', 0) for v in validations if v and v.metadata)
+                total_chars = sum(v.metadata.get('text_length', 0) for v in validations if v and v.metadata)
+                st.info(
+                    f"📄 **{len(files)} PDFs procesados:** {total_pages} página(s) totales | "
+                    f"{total_chars} caracteres extraídos"
+                )
 
         text_clean = text.strip() if isinstance(text, str) else ""
 
@@ -46,7 +97,7 @@ def process_uploaded_pdfs(files):
         return text_clean
 
     except Exception as e:
-        st.error(f"Error inesperado al procesar los PDF(s): {e}")
+        st.error(f"❌ Error inesperado al procesar los PDF(s): {e}")
         return None
 
 

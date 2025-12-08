@@ -158,6 +158,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Generación de CV Target personalizado por puesto
 - [x] Exportación a PDF de todos los documentos generados
 - [x] Prompts ultra estrictos para evitar alucinaciones de IA
+- [x] Validación avanzada de archivos PDF (tamaño, tipo, protección, contenido)
 
 ---
 
@@ -172,7 +173,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Exportar resultados descargables en **PDF**
 - [x] Completar formulario de **CV desde cero** con campos dinámicos
 - [x] Implementar campos de fecha con opción "Actualidad/En curso"
-- [ ] Validación avanzada de archivos PDF
+- [x] Validación avanzada de archivos PDF
 - [ ] Mejorar diseño visual de PDFs generados
 - [ ] Agregar templates de CV personalizables
 - [ ] Implementar análisis ATS del CV generado
