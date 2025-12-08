@@ -312,10 +312,18 @@ def main():
     with col_reset:
         st.markdown("<div style='margin-top: 0.3rem; text-align: right;'></div>", unsafe_allow_html=True)
         if st.button("🔄 Reiniciar", key="reset_button", help="Borrar todo y empezar de cero"):
+            # Incrementar contador de reset para forzar recreación de file uploaders
+            reset_count = st.session_state.get("reset_count", 0)
             # Limpiar todo el session_state
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
+            # Restaurar contador incrementado
+            st.session_state["reset_count"] = reset_count + 1
             st.rerun()
+    
+    # Inicializar contador de reset si no existe
+    if "reset_count" not in st.session_state:
+        st.session_state["reset_count"] = 0
     
     option = st.radio(
         "Seleccione una opción:",
@@ -335,6 +343,7 @@ def main():
             "Subir CV en formato PDF",
             type=["pdf"],
             help="El lector puede subir aquí su CV en archivo .pdf para analizarlo.",
+            key=f"cv_uploader_{st.session_state.get('reset_count', 0)}"
         )
 
         if uploaded_file and st.button("Procesar PDF"):
@@ -370,7 +379,7 @@ def main():
                 help=(
                     "Puedes subir PDFs de formación O bien omitir este paso."
                 ),
-                key="study_files_uploader",
+                key=f"study_files_uploader_{st.session_state.get('reset_count', 0)}",
             )
 
             # Procesar formación cargada
