@@ -333,6 +333,7 @@ def main():
                 st.session_state["cv_target"] = None
                 st.session_state["job_description_raw"] = None
                 st.success("El PDF del CV se procesó correctamente.")
+                st.rerun()
 
         # ----------------------------------------------------------------------
         # Subir PDFs de formación
@@ -389,6 +390,7 @@ def main():
                     st.session_state["cv_master"] = cv_master
                     st.session_state["linkedin_profile"] = None
                     st.session_state["cv_target"] = None
+                    st.rerun()
 
             # ------------------------------------------------------------------
             # Mostrar CV Maestro generado
@@ -440,6 +442,7 @@ def main():
                         linkedin_profile = generate_cv_output(prompt_linkedin)
 
                     st.session_state["linkedin_profile"] = linkedin_profile
+                    st.rerun()
 
                 if st.session_state.get("linkedin_profile"):
                     st.text_area(
@@ -496,6 +499,7 @@ def main():
                             cv_target = generate_cv_output(prompt_target)
 
                         st.session_state["cv_target"] = cv_target
+                        st.rerun()
 
                 if st.session_state.get("cv_target"):
                     st.text_area(
@@ -538,6 +542,7 @@ def main():
                                 job_description=st.session_state.get("job_description_raw", "")
                             )
                             st.session_state["ats_analysis"] = ats_result
+                            st.rerun()
                     
                     # Mostrar resultados del análisis ATS
                     if st.session_state.get("ats_analysis"):
@@ -910,6 +915,7 @@ def main():
                     cv_master = generate_cv_output(prompt)
 
                 st.session_state["cv_master"] = cv_master
+                st.rerun()
 
         # Si ya hay CV Maestro generado desde el formulario, mostramos y permitimos LinkedIn / Target
         if st.session_state.get("cv_master"):
@@ -953,6 +959,7 @@ def main():
                     linkedin_profile = generate_cv_output(prompt_linkedin)
 
                 st.session_state["linkedin_profile"] = linkedin_profile
+                st.rerun()
 
             if st.session_state.get("linkedin_profile"):
                 st.text_area(
@@ -1003,6 +1010,7 @@ def main():
                         cv_target = generate_cv_output(prompt_target)
 
                     st.session_state["cv_target"] = cv_target
+                    st.rerun()
 
             if st.session_state.get("cv_target"):
                 st.text_area(
@@ -1045,6 +1053,7 @@ def main():
                             job_description=st.session_state.get("job_description_raw", "")
                         )
                         st.session_state["ats_analysis_form"] = ats_result
+                        st.rerun()
                 
                 # Mostrar resultados del análisis ATS
                 if st.session_state.get("ats_analysis_form"):
