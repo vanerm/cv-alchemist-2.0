@@ -129,6 +129,21 @@ streamlit run app.py
 
 ---
 
+## 🧪 Recursos de Prueba
+
+Para probar la aplicación, puedes usar estos archivos de ejemplo:
+
+- 📁 [CVs de ejemplo (Google Drive)](https://drive.google.com/drive/folders/1LQL5kqim86RRGkrAQSE_xxzHgKDc4QdO?usp=sharing)
+- 📁 [Planes de estudio de ejemplo (Google Drive)](https://drive.google.com/drive/folders/13868l7n-mJJ_vfZD8g5x_RYOXDjJVQoa?usp=sharing)
+
+**Cómo usar:**
+1. Descarga un CV de ejemplo de la primera carpeta
+2. Súbelo en la opción "Subir un CV existente (PDF)"
+3. Opcionalmente, descarga un plan de estudios de la segunda carpeta
+4. Agrégalo en el paso 2 para ver cómo la IA integra nueva formación
+
+---
+
 ## ✨ Funcionalidades Principales
 
 ### 📄 Opción 1: Subir CV Existente
