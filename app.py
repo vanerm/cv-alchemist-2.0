@@ -347,7 +347,8 @@ def main():
         )
 
         if uploaded_file and st.button("Procesar PDF"):
-            cleaned_text = process_uploaded_pdfs(uploaded_file)
+            with st.spinner("Procesando PDF del CV..."):
+                cleaned_text = process_uploaded_pdfs(uploaded_file)
 
             if cleaned_text:
                 st.session_state["pdf_text_raw"] = cleaned_text
@@ -384,7 +385,9 @@ def main():
 
             # Procesar formación cargada
             if study_files and st.button("Procesar PDFs"):
-                studies_text_clean = process_uploaded_pdfs(study_files)
+                num_files = len(study_files) if isinstance(study_files, list) else 1
+                with st.spinner(f"Procesando {num_files} PDF(s) de formación... Esto puede tomar unos momentos."):
+                    studies_text_clean = process_uploaded_pdfs(study_files)
 
                 if studies_text_clean:
                     st.session_state["studies_text_clean"] = studies_text_clean
