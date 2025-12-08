@@ -160,6 +160,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Prompts ultra estrictos para evitar alucinaciones de IA
 - [x] Validación avanzada de archivos PDF (tamaño, tipo, protección, contenido)
 - [x] Diseño visual profesional de PDFs (tipografía, colores, iconos, layout)
+- [x] Templates personalizables (Clásico, Moderno, Minimalista, Creativo)
 
 ---
 
@@ -176,7 +177,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Implementar campos de fecha con opción "Actualidad/En curso"
 - [x] Validación avanzada de archivos PDF
 - [x] Mejorar diseño visual de PDFs generados
-- [ ] Agregar templates de CV personalizables
+- [x] Agregar templates de CV personalizables
 - [ ] Implementar análisis ATS del CV generado
 - [ ] Mejorar estilo y diseño de la **UI de Streamlit**
 - [ ] Deploy de la app en Streamlit Community Cloud

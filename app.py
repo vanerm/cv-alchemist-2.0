@@ -386,8 +386,21 @@ def main():
                     key="cv_master_output",
                 )
                 
+                # Selector de template
+                from src.cv_templates import get_template_names, get_template_by_display_name
+                template_names = get_template_names()
+                selected_template = st.selectbox(
+                    "🎨 Selecciona un template para el PDF",
+                    template_names,
+                    help="Elige el estilo visual para tu CV"
+                )
+                
+                # Mostrar descripción del template
+                tmpl = get_template_by_display_name(selected_template)
+                st.caption(f"📝 {tmpl.description}")
+                
                 # Botón de descarga PDF
-                pdf_bytes = generate_pdf(st.session_state["cv_master"], "CV Maestro")
+                pdf_bytes = generate_pdf(st.session_state["cv_master"], "CV Maestro", template=tmpl.name)
                 st.download_button(
                     label="📥 Descargar CV Maestro (PDF)",
                     data=pdf_bytes,
@@ -418,8 +431,18 @@ def main():
                         key="linkedin_output",
                     )
                     
+                    # Selector de template para LinkedIn
+                    selected_template_li = st.selectbox(
+                        "🎨 Template para LinkedIn",
+                        template_names,
+                        key="template_linkedin",
+                        help="Elige el estilo visual"
+                    )
+                    tmpl_li = get_template_by_display_name(selected_template_li)
+                    st.caption(f"📝 {tmpl_li.description}")
+                    
                     # Botón de descarga PDF
-                    pdf_bytes_linkedin = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn")
+                    pdf_bytes_linkedin = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn", template=tmpl_li.name)
                     st.download_button(
                         label="📥 Descargar Perfil LinkedIn (PDF)",
                         data=pdf_bytes_linkedin,
@@ -464,8 +487,18 @@ def main():
                         key="cv_target_output",
                     )
                     
+                    # Selector de template para CV Target
+                    selected_template_tg = st.selectbox(
+                        "🎨 Template para CV Target",
+                        template_names,
+                        key="template_target",
+                        help="Elige el estilo visual"
+                    )
+                    tmpl_tg = get_template_by_display_name(selected_template_tg)
+                    st.caption(f"📝 {tmpl_tg.description}")
+                    
                     # Botón de descarga PDF
-                    pdf_bytes_target = generate_pdf(st.session_state["cv_target"], "CV Target")
+                    pdf_bytes_target = generate_pdf(st.session_state["cv_target"], "CV Target", template=tmpl_tg.name)
                     st.download_button(
                         label="📥 Descargar CV Target (PDF)",
                         data=pdf_bytes_target,
@@ -776,8 +809,18 @@ def main():
                 key="cv_master_output_from_form",
             )
             
+            # Selector de template
+            selected_template_form = st.selectbox(
+                "🎨 Template para el PDF",
+                template_names,
+                key="template_form",
+                help="Elige el estilo visual"
+            )
+            tmpl_form = get_template_by_display_name(selected_template_form)
+            st.caption(f"📝 {tmpl_form.description}")
+            
             # Botón de descarga PDF
-            pdf_bytes_form = generate_pdf(st.session_state["cv_master"], "CV Maestro")
+            pdf_bytes_form = generate_pdf(st.session_state["cv_master"], "CV Maestro", template=tmpl_form.name)
             st.download_button(
                 label="📥 Descargar CV Maestro (PDF)",
                 data=pdf_bytes_form,
@@ -806,8 +849,18 @@ def main():
                     key="linkedin_output_from_form",
                 )
                 
+                # Selector de template
+                selected_template_li_form = st.selectbox(
+                    "🎨 Template para LinkedIn",
+                    template_names,
+                    key="template_linkedin_form",
+                    help="Elige el estilo visual"
+                )
+                tmpl_li_form = get_template_by_display_name(selected_template_li_form)
+                st.caption(f"📝 {tmpl_li_form.description}")
+                
                 # Botón de descarga PDF
-                pdf_bytes_linkedin_form = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn")
+                pdf_bytes_linkedin_form = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn", template=tmpl_li_form.name)
                 st.download_button(
                     label="📥 Descargar Perfil LinkedIn (PDF)",
                     data=pdf_bytes_linkedin_form,
@@ -846,8 +899,18 @@ def main():
                     key="cv_target_output_from_form",
                 )
                 
+                # Selector de template
+                selected_template_tg_form = st.selectbox(
+                    "🎨 Template para CV Target",
+                    template_names,
+                    key="template_target_form",
+                    help="Elige el estilo visual"
+                )
+                tmpl_tg_form = get_template_by_display_name(selected_template_tg_form)
+                st.caption(f"📝 {tmpl_tg_form.description}")
+                
                 # Botón de descarga PDF
-                pdf_bytes_target_form = generate_pdf(st.session_state["cv_target"], "CV Target")
+                pdf_bytes_target_form = generate_pdf(st.session_state["cv_target"], "CV Target", template=tmpl_tg_form.name)
                 st.download_button(
                     label="📥 Descargar CV Target (PDF)",
                     data=pdf_bytes_target_form,

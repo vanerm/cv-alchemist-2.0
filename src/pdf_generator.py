@@ -13,14 +13,7 @@ from reportlab.pdfgen import canvas
 from io import BytesIO
 from PIL import Image, ImageDraw
 import re
-
-
-# Paleta de colores profesional
-COLOR_PRIMARY = HexColor('#2C3E50')      # Azul oscuro
-COLOR_ACCENT = HexColor('#3498DB')       # Azul
-COLOR_TEXT = HexColor('#2C3E50')         # Texto principal
-COLOR_SECONDARY = HexColor('#7F8C8D')    # Gris para texto secundario
-COLOR_DIVIDER = HexColor('#BDC3C7')      # Líneas divisorias
+from .cv_templates import get_template, get_template_by_display_name
 
 
 def create_contact_icon(icon_type='circle', size=8, color='#3498DB'):
@@ -54,23 +47,21 @@ def create_contact_icon(icon_type='circle', size=8, color='#3498DB'):
     return icon_buffer
 
 
-def generate_pdf(content: str, title: str = "CV") -> bytes:
+def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> bytes:
     """
-    Genera un PDF profesional con diseño mejorado (4 fases implementadas).
-    
-    Fases:
-    1. Tipografía y espaciado mejorado
-    2. Líneas divisorias y colores
-    3. Iconos simples con Pillow
-    4. Layout optimizado con Platypus
+    Genera un PDF profesional con diseño mejorado y template personalizable.
     
     Args:
         content: Texto del CV en formato markdown
         title: Título del documento
+        template: Nombre del template (classic, modern, minimal, creative)
     
     Returns:
         bytes: Contenido del PDF en bytes
     """
+    
+    # Obtener configuración del template
+    tmpl = get_template(template)
     buffer = BytesIO()
     
     # Configuración del documento con márgenes optimizados
@@ -84,53 +75,53 @@ def generate_pdf(content: str, title: str = "CV") -> bytes:
         title=title
     )
     
-    # FASE 1: Estilos tipográficos mejorados
+    # Estilos tipográficos basados en el template
     styles = getSampleStyleSheet()
     
     # Estilo para nombre (header principal)
     styles.add(ParagraphStyle(
         name='CVName',
         parent=styles['Heading1'],
-        fontSize=20,
-        textColor=COLOR_PRIMARY,
+        fontSize=tmpl.font_sizes['name'],
+        textColor=tmpl.colors['primary'],
         spaceAfter=4,
         spaceBefore=0,
         alignment=TA_CENTER,
-        fontName='Helvetica-Bold'
+        fontName=tmpl.fonts['bold']
     ))
     
     # Estilo para titular profesional
     styles.add(ParagraphStyle(
         name='CVTitle',
         parent=styles['Normal'],
-        fontSize=12,
-        textColor=COLOR_ACCENT,
+        fontSize=tmpl.font_sizes['title'],
+        textColor=tmpl.colors.get('accent', tmpl.colors['primary']),
         spaceAfter=12,
         alignment=TA_CENTER,
-        fontName='Helvetica'
+        fontName=tmpl.fonts['main']
     ))
     
     # Estilo para información de contacto
     styles.add(ParagraphStyle(
         name='ContactInfo',
         parent=styles['Normal'],
-        fontSize=9,
-        textColor=COLOR_SECONDARY,
+        fontSize=tmpl.font_sizes['contact'],
+        textColor=tmpl.colors['secondary'],
         spaceAfter=16,
         alignment=TA_CENTER,
-        fontName='Helvetica'
+        fontName=tmpl.fonts['main']
     ))
     
-    # Estilo para títulos de sección (con color acento)
+    # Estilo para títulos de sección
     styles.add(ParagraphStyle(
         name='SectionHeading',
         parent=styles['Heading2'],
-        fontSize=13,
-        textColor=COLOR_ACCENT,
+        fontSize=tmpl.font_sizes['section'],
+        textColor=tmpl.colors.get('accent', tmpl.colors['primary']),
         spaceAfter=8,
         spaceBefore=14,
         alignment=TA_LEFT,
-        fontName='Helvetica-Bold',
+        fontName=tmpl.fonts['bold'],
         borderPadding=(0, 0, 4, 0)
     ))
     
@@ -138,34 +129,34 @@ def generate_pdf(content: str, title: str = "CV") -> bytes:
     styles.add(ParagraphStyle(
         name='SubHeading',
         parent=styles['Normal'],
-        fontSize=11,
-        textColor=COLOR_PRIMARY,
+        fontSize=tmpl.font_sizes['subheading'],
+        textColor=tmpl.colors['primary'],
         spaceAfter=3,
         spaceBefore=6,
         alignment=TA_LEFT,
-        fontName='Helvetica-Bold'
+        fontName=tmpl.fonts['bold']
     ))
     
     # Estilo para texto secundario (fechas, ubicación)
     styles.add(ParagraphStyle(
         name='SecondaryText',
         parent=styles['Normal'],
-        fontSize=9,
-        textColor=COLOR_SECONDARY,
+        fontSize=tmpl.font_sizes['secondary'],
+        textColor=tmpl.colors['secondary'],
         spaceAfter=4,
         alignment=TA_LEFT,
-        fontName='Helvetica'
+        fontName=tmpl.fonts['main']
     ))
     
     # Estilo para texto normal del cuerpo
     styles.add(ParagraphStyle(
         name='CVBodyText',
         parent=styles['Normal'],
-        fontSize=10,
-        textColor=COLOR_TEXT,
+        fontSize=tmpl.font_sizes['body'],
+        textColor=tmpl.colors['text'],
         spaceAfter=6,
         alignment=TA_JUSTIFY,
-        fontName='Helvetica',
+        fontName=tmpl.fonts['main'],
         leading=14
     ))
     
@@ -173,11 +164,11 @@ def generate_pdf(content: str, title: str = "CV") -> bytes:
     styles.add(ParagraphStyle(
         name='BulletText',
         parent=styles['Normal'],
-        fontSize=10,
-        textColor=COLOR_TEXT,
+        fontSize=tmpl.font_sizes['body'],
+        textColor=tmpl.colors['text'],
         spaceAfter=4,
         alignment=TA_LEFT,
-        fontName='Helvetica',
+        fontName=tmpl.fonts['main'],
         leftIndent=12,
         bulletIndent=0
     ))
@@ -234,10 +225,11 @@ def generate_pdf(content: str, title: str = "CV") -> bytes:
             contact_text = escape_html(contact_text)
             story.append(Paragraph(contact_text, styles['ContactInfo']))
         
-        # FASE 2: Línea divisoria después del header
-        story.append(Spacer(1, 0.05*inch))
-        story.append(create_divider_line())
-        story.append(Spacer(1, 0.15*inch))
+        # Línea divisoria después del header (si el template lo usa)
+        if tmpl.use_dividers:
+            story.append(Spacer(1, 0.05*inch))
+            story.append(create_divider_line(template=tmpl))
+            story.append(Spacer(1, tmpl.spacing['section']*inch))
     
     # Procesar resto del contenido
     current_section = []
@@ -259,14 +251,15 @@ def generate_pdf(content: str, title: str = "CV") -> bytes:
                 story.extend(current_section)
                 current_section = []
             
-            # FASE 2: Título de sección con línea
+            # Título de sección con línea
             section_title = line.strip('*').strip()
             section_title = escape_html(section_title)
             
             story.append(Spacer(1, 0.05*inch))
             story.append(Paragraph(section_title, styles['SectionHeading']))
-            story.append(create_divider_line(width=2, color=COLOR_ACCENT))
-            story.append(Spacer(1, 0.08*inch))
+            if tmpl.use_dividers:
+                story.append(create_divider_line(template=tmpl, section=True))
+            story.append(Spacer(1, tmpl.spacing['subsection']*inch))
             
         # Detectar subtítulo (empresa/puesto con **)
         elif '**' in line and not line.startswith('▶'):
@@ -288,8 +281,9 @@ def generate_pdf(content: str, title: str = "CV") -> bytes:
         elif line.startswith('•') or line.startswith('-'):
             text = line.lstrip('•-').strip()
             text = process_markdown_bold(text)
-            # FASE 3: Bullet con icono
-            bullet_text = f'<font color="{COLOR_ACCENT.hexval()}">•</font> {text}'
+            # Bullet con color del template
+            accent_color = tmpl.colors.get('accent', tmpl.colors['primary'])
+            bullet_text = f'<font color="{accent_color.hexval()}">•</font> {text}'
             current_section.append(Paragraph(bullet_text, styles['BulletText']))
             
         # Texto normal
@@ -338,17 +332,33 @@ def process_markdown_bold(text: str) -> str:
     return ''.join(escaped_parts)
 
 
-def create_divider_line(width=1, color=COLOR_DIVIDER):
+def create_divider_line(template=None, section=False):
     """
     Crea una línea divisoria horizontal usando Table.
     
     Args:
-        width: Grosor de la línea en puntos
-        color: Color de la línea
+        template: CVTemplate con configuración de estilo
+        section: Si True, usa estilo de sección (más grueso)
     
     Returns:
         Table con la línea divisoria
     """
+    if template is None:
+        from .cv_templates import MODERN_TEMPLATE
+        template = MODERN_TEMPLATE
+    
+    # Determinar grosor y color según el template
+    if template.divider_style == "thin":
+        width = 0.5 if not section else 1
+    elif template.divider_style == "bold":
+        width = 2 if not section else 3
+    elif template.divider_style == "colored":
+        width = 1 if not section else 2
+    else:  # none
+        return Spacer(1, 0)
+    
+    color = template.colors.get('accent', template.colors['divider']) if section else template.colors['divider']
+    
     line_table = Table([['']], colWidths=[6.5*inch])
     line_table.setStyle(TableStyle([
         ('LINEABOVE', (0, 0), (-1, 0), width, color),
