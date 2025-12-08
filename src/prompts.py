@@ -69,6 +69,10 @@ def build_prompt_master(cv_text: str, new_studies: str) -> str:
     - Si el CV base incluye expresiones emocionales, puedes reescribirlas en un tono
       profesional y orientado a resultados, manteniendo el sentido pero reduciendo
       la carga emocional.
+    - IMPORTANTE: NO agregues títulos o etiquetas como "Contactar", "Contacto",
+      "Información de Contacto" antes del nombre y datos personales. El nombre y
+      la información de contacto deben aparecer directamente al inicio sin ningún
+      título previo.
 
     A continuación se incluyen los documentos:
 
