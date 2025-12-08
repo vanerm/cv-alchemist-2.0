@@ -23,6 +23,70 @@ def create_sidebar():
         
         st.markdown("---")
         
+        # Selector de modelo de IA
+        st.markdown("### 🤖 Modelo de IA")
+        
+        # Modelos disponibles de OpenAI
+        openai_models = [
+            "gpt-4o-mini (recomendado)",
+            "gpt-4o",
+            "gpt-4-turbo-preview",
+            "gpt-3.5-turbo"
+        ]
+        
+        gemini_models = [
+            "gemini-flash-latest (recomendado)",
+            "gemini-2.5-flash",
+            "gemini-2.5-pro",
+            "gemini-pro-latest",
+            "gemini-2.0-flash"
+        ]
+        
+        ai_provider = st.selectbox(
+            "Proveedor",
+            ["Auto (fallback)", "OpenAI", "Gemini"],
+            index=0,
+            key="ai_provider_select",
+            help="Auto intenta OpenAI primero, si falla usa Gemini"
+        )
+        
+        # Selector de modelo según proveedor
+        if ai_provider == "OpenAI":
+            st.session_state["ai_provider"] = "openai"
+            selected_model = st.selectbox(
+                "Modelo OpenAI",
+                openai_models,
+                index=0,
+                key="openai_model_select"
+            )
+            # Extraer nombre del modelo (sin el texto adicional)
+            model_name = selected_model.split(" ")[0]
+            st.session_state["ai_model"] = model_name
+            # Debug: mostrar modelo seleccionado
+            print(f"✓ Modelo seleccionado: {model_name}")
+            
+        elif ai_provider == "Gemini":
+            st.session_state["ai_provider"] = "gemini"
+            selected_model = st.selectbox(
+                "Modelo Gemini",
+                gemini_models,
+                index=0,
+                key="gemini_model_select"
+            )
+            # Extraer nombre del modelo (sin el texto adicional)
+            model_name = selected_model.split(" ")[0]
+            st.session_state["ai_model"] = model_name
+            # Debug: mostrar modelo seleccionado
+            print(f"✓ Modelo seleccionado: {model_name}")
+            
+        else:  # Auto
+            st.session_state["ai_provider"] = "auto"
+            st.session_state["ai_model"] = None
+            st.info("🔄 Modo automático: Intenta OpenAI (gpt-4o-mini) → Gemini (gemini-flash-latest)")
+            print("✓ Modo automático activado")
+        
+        st.markdown("---")
+        
         # Progress Tracker
         st.markdown("### 📍 Progreso")
         

@@ -175,7 +175,15 @@ def apply_custom_styles():
         
         /* Texto en sidebar */
         [data-testid="stSidebar"] * {
-            color: #2C3E50;
+            color: #2C3E50 !important;
+        }
+        
+        /* Labels y textos de formularios en sidebar */
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] .stMarkdown,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] span {
+            color: #2C3E50 !important;
         }
         
         [data-testid="stSidebar"] h1,
@@ -385,6 +393,101 @@ def apply_custom_styles():
         .stSelectbox > div > div:focus-within {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* Selectbox en sidebar - fondo lila pastel */
+        [data-testid="stSidebar"] .stSelectbox > div > div {
+            background-color: var(--lavender-lighter) !important;
+            border: 1px solid var(--lavender-border) !important;
+        }
+        
+        /* Texto del selectbox en sidebar */
+        [data-testid="stSidebar"] .stSelectbox label,
+        [data-testid="stSidebar"] .stSelectbox span,
+        [data-testid="stSidebar"] .stSelectbox p,
+        [data-testid="stSidebar"] .stSelectbox div {
+            color: #2C3E50 !important;
+        }
+        
+        /* Valor seleccionado en el selectbox */
+        [data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] > div,
+        [data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] span {
+            color: #2C3E50 !important;
+            background-color: var(--lavender-lighter) !important;
+        }
+        
+        /* Dropdown del selectbox - FORZAR fondo lila pastel con múltiples selectores */
+        [data-testid="stSidebar"] .stSelectbox [role="listbox"],
+        [data-testid="stSidebar"] .stSelectbox [role="option"],
+        [data-testid="stSidebar"] [data-baseweb="select"] ul,
+        [data-testid="stSidebar"] [data-baseweb="select"] li {
+            background-color: #f3f0ff !important;
+            color: #2C3E50 !important;
+        }
+        
+        /* Opción hover en dropdown - lila más claro */
+        [data-testid="stSidebar"] .stSelectbox [role="option"]:hover,
+        [data-testid="stSidebar"] [data-baseweb="select"] li:hover {
+            background-color: #ede9fe !important;
+            color: #2C3E50 !important;
+        }
+        
+        /* Opción seleccionada en dropdown - lila con borde */
+        [data-testid="stSidebar"] .stSelectbox [aria-selected="true"],
+        [data-testid="stSidebar"] [data-baseweb="select"] li[aria-selected="true"] {
+            background-color: #ede9fe !important;
+            color: #2C3E50 !important;
+            border-left: 3px solid #667eea !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Contenedor del dropdown (popover) - FORZAR fondo lila */
+        [data-testid="stSidebar"] [data-baseweb="popover"],
+        [data-testid="stSidebar"] [data-baseweb="popover"] > div {
+            background-color: #f3f0ff !important;
+        }
+        
+        /* Lista de opciones del dropdown - FORZAR fondo lila */
+        [data-testid="stSidebar"] [data-baseweb="menu"],
+        [data-testid="stSidebar"] [data-baseweb="menu"] > ul {
+            background-color: #f3f0ff !important;
+            border: 1px solid #c4b5fd !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Selectbox desplegado - contenedor principal */
+        [data-testid="stSidebar"] div[data-baseweb="select"] > div[role="listbox"] {
+            background-color: #f3f0ff !important;
+        }
+        
+        /* FORZAR todos los elementos internos del dropdown */
+        [data-testid="stSidebar"] [data-baseweb="select"] * {
+            background-color: #f3f0ff !important;
+        }
+        
+        /* Texto de las opciones */
+        [data-testid="stSidebar"] [data-baseweb="select"] li span,
+        [data-testid="stSidebar"] [data-baseweb="select"] li div {
+            color: #2C3E50 !important;
+        }
+        
+        /* Override global para cualquier dropdown en sidebar */
+        [data-testid="stSidebar"] ul[role="listbox"],
+        [data-testid="stSidebar"] div[role="listbox"],
+        [data-testid="stSidebar"] ul[role="listbox"] li,
+        [data-testid="stSidebar"] div[role="listbox"] div {
+            background: #f3f0ff !important;
+            background-color: #f3f0ff !important;
+        }
+        
+        /* Forzar en elementos específicos de Streamlit */
+        [data-testid="stSidebar"] [class*="option"],
+        [data-testid="stSidebar"] [class*="Option"],
+        [data-testid="stSidebar"] [class*="menu"],
+        [data-testid="stSidebar"] [class*="Menu"] {
+            background: #f3f0ff !important;
+            background-color: #f3f0ff !important;
+            color: #2C3E50 !important;
         }
         
         /* ========== Expander Mejorado ========== */

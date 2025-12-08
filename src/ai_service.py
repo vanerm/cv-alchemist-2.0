@@ -60,13 +60,14 @@ def _configure_gemini() -> bool:
     """
     global _gemini_configured
     
-    if not _gemini_configured:
-        api_key = os.getenv("GEMINI_API_KEY")
-        if api_key:
-            genai.configure(api_key=api_key)
-            _gemini_configured = True
+    # Siempre reconfigurar para asegurar que esté actualizado
+    api_key = os.getenv("GEMINI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+        _gemini_configured = True
+        return True
     
-    return _gemini_configured
+    return False
 
 
 def _generate_with_openai(prompt: str, model: str) -> Optional[str]:
@@ -75,10 +76,13 @@ def _generate_with_openai(prompt: str, model: str) -> Optional[str]:
     Retorna el texto generado o None si falla.
     """
     try:
-        client = _get_openai_client()
-        if not client:
+        # Obtener cliente fresco cada vez para evitar problemas de caché
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
             print("⚠️ OpenAI: No se encontró OPENAI_API_KEY")
             return None
+        
+        client = OpenAI(api_key=api_key)
 
         response = client.chat.completions.create(
             model=model,
@@ -108,7 +112,8 @@ def _generate_with_openai(prompt: str, model: str) -> Optional[str]:
         return response.choices[0].message.content
 
     except Exception as e:
-        print(f"❌ OpenAI error: {type(e).__name__}: {str(e)}")
+        error_msg = f"{type(e).__name__}: {str(e)}"
+        print(f"❌ OpenAI error: {error_msg}")
         return None
 
 
@@ -155,22 +160,64 @@ def _generate_with_gemini(prompt: str, model: str) -> Optional[str]:
         return response.text
 
     except Exception as e:
-        print(f"❌ Gemini error: {type(e).__name__}: {str(e)}")
+        error_msg = f"{type(e).__name__}: {str(e)}"
+        print(f"❌ Gemini error: {error_msg}")
         return None
 
 
-def generate_cv_output(prompt: str, model: Optional[str] = None) -> str:
+def generate_cv_output(prompt: str, model: Optional[str] = None, provider: str = "auto") -> str:
     """
-    Genera texto del CV usando IA con fallback automático.
-    Intenta primero con OpenAI, si falla usa Gemini.
+    Genera texto del CV usando IA con fallback automático o proveedor específico.
 
     Parámetros:
         prompt: Instrucciones completas que describen la tarea a la IA.
         model: Nombre del modelo a utilizar (opcional).
+        provider: "auto" (fallback), "openai", o "gemini"
 
     Retorna:
         Texto generado por el modelo o un mensaje de error amigable.
     """
+    # Proveedor específico: solo OpenAI
+    if provider == "openai":
+        openai_model = model if model else DEFAULT_OPENAI_MODEL
+        print(f"🔄 Generando con OpenAI ({openai_model})...")
+        result = _generate_with_openai(prompt, openai_model)
+        
+        if result:
+            print("✅ Contenido generado exitosamente con OpenAI")
+            return result
+        
+        return (
+            "⚠️ No se pudo generar contenido con OpenAI.\n\n"
+            "Por favor verifica:\n"
+            "- OPENAI_API_KEY está configurada correctamente\n"
+            "- El modelo es válido\n"
+            "- Hay conexión a internet\n"
+            "- No se excedieron los límites de uso\n\n"
+            "Prueba cambiar a 'Gemini' o 'Auto' en el selector del sidebar."
+        )
+    
+    # Proveedor específico: solo Gemini
+    if provider == "gemini":
+        gemini_model = model if model else DEFAULT_GEMINI_MODEL
+        print(f"🔄 Generando con Gemini ({gemini_model})...")
+        result = _generate_with_gemini(prompt, gemini_model)
+        
+        if result:
+            print("✅ Contenido generado exitosamente con Gemini")
+            return result
+        
+        return (
+            "⚠️ No se pudo generar contenido con Gemini.\n\n"
+            "Por favor verifica:\n"
+            "- GEMINI_API_KEY está configurada correctamente\n"
+            "- El modelo es válido\n"
+            "- Hay conexión a internet\n"
+            "- No se excedieron los límites de uso\n\n"
+            "Prueba cambiar a 'OpenAI' o 'Auto' en el selector del sidebar."
+        )
+    
+    # Modo auto: fallback automático
     # Intentar con OpenAI primero
     openai_model = model or DEFAULT_OPENAI_MODEL
     print(f"🔄 Intentando generar con OpenAI ({openai_model})...")

@@ -445,8 +445,19 @@ def main():
                         new_studies=st.session_state["studies_text_clean"] or "",
                     )
 
-                    with st.spinner("Generando CV Maestro con IA..."):
-                        cv_master = generate_cv_output(prompt)
+                    provider = st.session_state.get("ai_provider", "auto")
+                    model = st.session_state.get("ai_model")
+                    
+                    # Determinar nombre del modelo para mostrar
+                    if provider == "auto":
+                        model_name = "IA (OpenAI → Gemini)"
+                    elif model:
+                        model_name = model
+                    else:
+                        model_name = "IA"
+                    
+                    with st.spinner(f"Generando CV Maestro con {model_name}..."):
+                        cv_master = generate_cv_output(prompt, model=model, provider=provider)
 
                     st.session_state["cv_master"] = cv_master
                     st.session_state["linkedin_profile"] = None
@@ -497,8 +508,19 @@ def main():
                         master_cv=st.session_state["cv_master"]
                     )
 
-                    with st.spinner("Generando perfil LinkedIn con IA..."):
-                        linkedin_profile = generate_cv_output(prompt_linkedin)
+                    provider = st.session_state.get("ai_provider", "auto")
+                    model = st.session_state.get("ai_model")
+                    
+                    # Determinar nombre del modelo para mostrar
+                    if provider == "auto":
+                        model_name = "IA (OpenAI → Gemini)"
+                    elif model:
+                        model_name = model
+                    else:
+                        model_name = "IA"
+                    
+                    with st.spinner(f"Generando perfil LinkedIn con {model_name}..."):
+                        linkedin_profile = generate_cv_output(prompt_linkedin, model=model, provider=provider)
 
                     st.session_state["linkedin_profile"] = linkedin_profile
                     st.rerun()
@@ -554,8 +576,19 @@ def main():
                             job_description=st.session_state["job_description_raw"],
                         )
 
-                        with st.spinner("Generando CV Target con IA..."):
-                            cv_target = generate_cv_output(prompt_target)
+                        provider = st.session_state.get("ai_provider", "auto")
+                        model = st.session_state.get("ai_model")
+                        
+                        # Determinar nombre del modelo para mostrar
+                        if provider == "auto":
+                            model_name = "IA (OpenAI → Gemini)"
+                        elif model:
+                            model_name = model
+                        else:
+                            model_name = "IA"
+                        
+                        with st.spinner(f"Generando CV Target con {model_name}..."):
+                            cv_target = generate_cv_output(prompt_target, model=model, provider=provider)
 
                         st.session_state["cv_target"] = cv_target
                         st.rerun()
@@ -1080,8 +1113,19 @@ def main():
                     new_studies="",  # nada adicional
                 )
 
-                with st.spinner("Generando CV Maestro con IA a partir del formulario..."):
-                    cv_master = generate_cv_output(prompt)
+                provider = st.session_state.get("ai_provider", "auto")
+                model = st.session_state.get("ai_model")
+                
+                # Determinar nombre del modelo para mostrar
+                if provider == "auto":
+                    model_name = "IA (OpenAI → Gemini)"
+                elif model:
+                    model_name = model
+                else:
+                    model_name = "IA"
+                
+                with st.spinner(f"Generando CV Maestro con {model_name}..."):
+                    cv_master = generate_cv_output(prompt, model=model, provider=provider)
 
                 st.session_state["cv_master"] = cv_master
                 st.rerun()
@@ -1124,8 +1168,19 @@ def main():
                     master_cv=st.session_state["cv_master"]
                 )
 
-                with st.spinner("Generando perfil LinkedIn con IA..."):
-                    linkedin_profile = generate_cv_output(prompt_linkedin)
+                provider = st.session_state.get("ai_provider", "auto")
+                model = st.session_state.get("ai_model")
+                
+                # Determinar nombre del modelo para mostrar
+                if provider == "auto":
+                    model_name = "IA (OpenAI → Gemini)"
+                elif model:
+                    model_name = model
+                else:
+                    model_name = "IA"
+                
+                with st.spinner(f"Generando perfil LinkedIn con {model_name}..."):
+                    linkedin_profile = generate_cv_output(prompt_linkedin, model=model, provider=provider)
 
                 st.session_state["linkedin_profile"] = linkedin_profile
                 st.rerun()
@@ -1175,8 +1230,19 @@ def main():
                         job_description=st.session_state["job_description_raw"],
                     )
 
-                    with st.spinner("Generando CV Target con IA..."):
-                        cv_target = generate_cv_output(prompt_target)
+                    provider = st.session_state.get("ai_provider", "auto")
+                    model = st.session_state.get("ai_model")
+                    
+                    # Determinar nombre del modelo para mostrar
+                    if provider == "auto":
+                        model_name = "IA (OpenAI → Gemini)"
+                    elif model:
+                        model_name = model
+                    else:
+                        model_name = "IA"
+                    
+                    with st.spinner(f"Generando CV Target con {model_name}..."):
+                        cv_target = generate_cv_output(prompt_target, model=model, provider=provider)
 
                     st.session_state["cv_target"] = cv_target
                     st.rerun()
