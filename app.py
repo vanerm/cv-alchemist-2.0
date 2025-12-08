@@ -10,6 +10,7 @@ from src.prompts import (
     build_prompt_targeted,
     build_prompt_linkedin_profile,
 )
+from src.pdf_generator import generate_pdf
 
 
 def process_uploaded_pdfs(files):
@@ -333,6 +334,15 @@ def main():
                     height=400,
                     key="cv_master_output",
                 )
+                
+                # Botón de descarga PDF
+                pdf_bytes = generate_pdf(st.session_state["cv_master"], "CV Maestro")
+                st.download_button(
+                    label="📥 Descargar CV Maestro (PDF)",
+                    data=pdf_bytes,
+                    file_name="cv_maestro.pdf",
+                    mime="application/pdf",
+                )
 
                 # ==============================================================
                 # 🟦 Sección 5: Generar Perfil LinkedIn
@@ -355,6 +365,15 @@ def main():
                         value=st.session_state["linkedin_profile"],
                         height=350,
                         key="linkedin_output",
+                    )
+                    
+                    # Botón de descarga PDF
+                    pdf_bytes_linkedin = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn")
+                    st.download_button(
+                        label="📥 Descargar Perfil LinkedIn (PDF)",
+                        data=pdf_bytes_linkedin,
+                        file_name="perfil_linkedin.pdf",
+                        mime="application/pdf",
                     )
 
                 # ==============================================================
@@ -392,6 +411,15 @@ def main():
                         value=st.session_state["cv_target"],
                         height=400,
                         key="cv_target_output",
+                    )
+                    
+                    # Botón de descarga PDF
+                    pdf_bytes_target = generate_pdf(st.session_state["cv_target"], "CV Target")
+                    st.download_button(
+                        label="📥 Descargar CV Target (PDF)",
+                        data=pdf_bytes_target,
+                        file_name="cv_target.pdf",
+                        mime="application/pdf",
                     )
 
         else:
@@ -649,6 +677,15 @@ def main():
                 height=400,
                 key="cv_master_output_from_form",
             )
+            
+            # Botón de descarga PDF
+            pdf_bytes_form = generate_pdf(st.session_state["cv_master"], "CV Maestro")
+            st.download_button(
+                label="📥 Descargar CV Maestro (PDF)",
+                data=pdf_bytes_form,
+                file_name="cv_maestro.pdf",
+                mime="application/pdf",
+            )
 
             # Perfil LinkedIn
             st.markdown("### 3) Generar versión para LinkedIn")
@@ -669,6 +706,15 @@ def main():
                     value=st.session_state["linkedin_profile"],
                     height=350,
                     key="linkedin_output_from_form",
+                )
+                
+                # Botón de descarga PDF
+                pdf_bytes_linkedin_form = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn")
+                st.download_button(
+                    label="📥 Descargar Perfil LinkedIn (PDF)",
+                    data=pdf_bytes_linkedin_form,
+                    file_name="perfil_linkedin.pdf",
+                    mime="application/pdf",
                 )
 
             # CV Target
@@ -700,6 +746,15 @@ def main():
                     value=st.session_state["cv_target"],
                     height=400,
                     key="cv_target_output_from_form",
+                )
+                
+                # Botón de descarga PDF
+                pdf_bytes_target_form = generate_pdf(st.session_state["cv_target"], "CV Target")
+                st.download_button(
+                    label="📥 Descargar CV Target (PDF)",
+                    data=pdf_bytes_target_form,
+                    file_name="cv_target.pdf",
+                    mime="application/pdf",
                 )
 
 
