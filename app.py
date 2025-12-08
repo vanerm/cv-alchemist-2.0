@@ -299,8 +299,20 @@ def main():
         "Aplicación con IA para crear y optimizar CVs profesionales"
     )
 
-    # Selección de modo
-    st.markdown("### ¿Qué desea hacer?")
+    # Selección de modo con botón de reiniciar
+    col_title, col_reset = st.columns([5, 1], gap="small")
+    
+    with col_title:
+        st.markdown("### ¿Qué desea hacer?")
+    
+    with col_reset:
+        st.markdown("<div style='margin-top: 0.3rem; text-align: right;'></div>", unsafe_allow_html=True)
+        if st.button("🔄 Reiniciar", key="reset_button", help="Borrar todo y empezar de cero"):
+            # Limpiar todo el session_state
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            st.rerun()
+    
     option = st.radio(
         "Seleccione una opción:",
         ["Subir un CV existente (PDF)", "Crear CV desde cero"],
@@ -332,8 +344,13 @@ def main():
                 st.session_state["linkedin_profile"] = None
                 st.session_state["cv_target"] = None
                 st.session_state["job_description_raw"] = None
-                st.success("El PDF del CV se procesó correctamente.")
+                st.session_state["show_success_pdf"] = True
                 st.rerun()
+        
+        # Mostrar mensaje de éxito después del rerun
+        if st.session_state.get("show_success_pdf"):
+            st.success("El PDF del CV se procesó correctamente.")
+            st.session_state["show_success_pdf"] = False
 
         # ----------------------------------------------------------------------
         # Subir PDFs de formación
