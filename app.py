@@ -3,7 +3,7 @@ from src.extract_pdf import (
     extract_text_from_pdf,
     extract_text_from_multiple_pdfs,
 )
-# from src.form_helpers import get_cv_form_data  # ya no lo usamos en esta versión
+from src.form_helpers import get_cv_form_data  # ahora no lo usamos, pero lo dejamos por compatibilidad
 from src.ai_service import generate_cv_output
 from src.prompts import (
     build_prompt_master,
@@ -21,10 +21,12 @@ def process_uploaded_pdfs(files):
             st.error("No se recibió ningún archivo PDF para procesar.")
             return None
 
+        # Un solo archivo
         if not isinstance(files, list):
             files.seek(0)
             text = extract_text_from_pdf(files)
         else:
+            # Lista de archivos
             if len(files) == 1:
                 files[0].seek(0)
                 text = extract_text_from_pdf(files[0])
@@ -45,6 +47,167 @@ def process_uploaded_pdfs(files):
     except Exception as e:
         st.error(f"Error inesperado al procesar los PDF(s): {e}")
         return None
+
+
+# ----------------------------------------------------------------------
+# Helper: construir texto de CV base a partir del formulario
+# ----------------------------------------------------------------------
+def _format_period_helper(from_date, to_date, is_current):
+    """Helper para formatear periodos de fecha."""
+    if not from_date and not to_date and not is_current:
+        return ""
+    
+    from_str = from_date.strftime("%m/%Y") if from_date else ""
+    
+    if is_current:
+        to_str = "Actualidad"
+    elif to_date:
+        to_str = to_date.strftime("%m/%Y")
+    else:
+        to_str = ""
+    
+    if from_str and to_str:
+        return f"{from_str} – {to_str}"
+    elif from_str:
+        return from_str
+    elif to_str:
+        return to_str
+    return ""
+
+
+def build_cv_text_from_form(data: dict) -> str:
+    """
+    Recibe un diccionario con la info del formulario y construye
+    un texto de CV base en formato similar al CV Maestro.
+    """
+    lines = []
+
+    # Encabezado de contacto
+    contact_line = " | ".join(
+        [
+            data.get("full_name", "").strip(),
+            data.get("email", "").strip(),
+            data.get("phone", "").strip(),
+            data.get("location", "").strip(),
+        ]
+    ).strip(" |")
+
+    if contact_line:
+        lines.append(contact_line)
+        lines.append("")
+
+    # Titular
+    headline = data.get("headline", "").strip()
+    if headline:
+        lines.append(headline)
+        lines.append("")
+
+    # Resumen profesional
+    summary = data.get("summary", "").strip()
+    if summary:
+        lines.append("**Resumen Profesional**")
+        lines.append(summary)
+        lines.append("")
+
+    # Experiencia profesional
+    experiences = data.get("experiences", [])
+    if experiences:
+        lines.append("**Experiencia Profesional**")
+        for exp in experiences:
+            role = exp.get("role", "").strip()
+            company = exp.get("company", "").strip()
+            location = exp.get("location", "").strip()
+            from_date = exp.get("from_date")
+            to_date = exp.get("to_date")
+            is_current = exp.get("is_current", False)
+            desc = exp.get("description", "").strip()
+
+            # Si está todo vacío, lo saltamos
+            if not (role or company or desc):
+                continue
+
+            header_parts = []
+            if company:
+                header_parts.append(company)
+            if role:
+                header_parts.append(role)
+
+            if header_parts:
+                lines.append("**" + " — ".join(header_parts) + "**")
+
+            meta_parts = []
+            if location:
+                meta_parts.append(location)
+            
+            dates_str = _format_period_helper(from_date, to_date, is_current)
+            if dates_str:
+                meta_parts.append(dates_str)
+            
+            if meta_parts:
+                lines.append(" · ".join(meta_parts))
+
+            if desc:
+                lines.append(desc)
+
+            lines.append("")
+
+    # Educación
+    educations = data.get("educations", [])
+    if educations:
+        lines.append("**Educación**")
+        for edu in educations:
+            degree = edu.get("degree", "").strip()
+            institution = edu.get("institution", "").strip()
+            from_date = edu.get("from_date")
+            to_date = edu.get("to_date")
+            is_current = edu.get("is_current", False)
+
+            if not (degree or institution):
+                continue
+
+            title_parts = []
+            if degree:
+                title_parts.append(degree)
+            if institution:
+                title_parts.append(institution)
+
+            lines.append(" · ".join(title_parts))
+
+            dates_str = _format_period_helper(from_date, to_date, is_current)
+            if dates_str:
+                lines.append(dates_str)
+
+        lines.append("")
+
+    # Proyectos relevantes
+    projects = data.get("projects", [])
+    if projects:
+        lines.append("**Proyectos Relevantes**")
+        for proj in projects:
+            name = proj.get("name", "").strip()
+            desc = proj.get("description", "").strip()
+            link = proj.get("link", "").strip()
+
+            if not (name or desc or link):
+                continue
+
+            if name:
+                lines.append(f"▶ **{name}**")
+            if desc:
+                lines.append(desc)
+            if link:
+                lines.append(link)
+
+            lines.append("")
+
+    # Habilidades
+    skills = data.get("skills", "").strip()
+    if skills:
+        lines.append("**Habilidades**")
+        lines.append(skills)
+
+    # Unimos todo
+    return "\n".join(lines).strip()
 
 
 def main():
@@ -240,172 +403,304 @@ def main():
     else:
         st.markdown("### 1) Completar formulario para crear CV base")
 
-        with st.form("cv_from_scratch_form"):
-            name = st.text_input("Nombre completo")
-            email = st.text_input("Email de contacto")
-            phone = st.text_input("Teléfono (opcional)")
-            location = st.text_input("Ubicación (ciudad, país)")
-            headline = st.text_input("Titular profesional (opcional)")
-            profile = st.text_area("Resumen profesional / Perfil")
-            experience = st.text_area(
-                "Experiencia profesional (puedes listar puestos, fechas y funciones)"
+        # ----------------- Datos personales -----------------
+        st.markdown("#### Datos personales")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            full_name = st.text_input(
+                "Nombre completo*",
+                placeholder="Ej: Ana Pérez",
             )
-            education = st.text_area(
-                "Educación / Formación (títulos, instituciones, fechas)"
+            email = st.text_input(
+                "Email*",
+                placeholder="nombre@correo.com",
             )
-            projects = st.text_area(
-                "Proyectos relevantes (opcional: proyectos personales, académicos, etc.)"
-            )
-            skills = st.text_area(
-                "Habilidades (separadas por coma: ej. Excel, SQL, Comunicación)"
+            phone = st.text_input(
+                "Teléfono",
+                placeholder="+54 9 11 ...",
             )
 
-            submitted = st.form_submit_button("Guardar CV base")
+        with col2:
+            headline = st.text_input(
+                "Titular profesional",
+                placeholder="Ej: Analista de Datos Jr | Contador Público",
+            )
+            location = st.text_input(
+                "Ubicación",
+                placeholder="Ciudad, País",
+            )
 
-        if submitted:
-            # Construimos un CV base en texto plano
-            lines = []
+        summary = st.text_area(
+            "Resumen profesional (opcional)",
+            placeholder="Resume tu perfil en 3–4 líneas: experiencia principal, fortalezas y objetivo.",
+            height=120,
+        )
 
-            # Encabezado de contacto
-            contact_parts = [p for p in [name, email, phone, location] if p]
-            if contact_parts:
-                lines.append(" | ".join(contact_parts))
-                lines.append("")
+        # ----------------- Experiencia -----------------
+        st.markdown("#### Experiencia profesional")
+        n_exp = st.number_input(
+            "Cantidad de empleos a incluir",
+            min_value=0,
+            max_value=10,
+            value=1,
+            step=1,
+        )
 
-            if headline:
-                lines.append(headline)
-                lines.append("")
+        experiences = []
+        for i in range(int(n_exp)):
+            st.markdown(f"**Empleo {i+1}**")
+            role = st.text_input(
+                f"Puesto {i+1}",
+                key=f"role_{i}",
+                placeholder="Ej: Analista de Datos Jr",
+            )
+            company = st.text_input(
+                f"Empresa {i+1}",
+                key=f"company_{i}",
+                placeholder="Ej: Mercado Libre",
+            )
+            location_job = st.text_input(
+                f"Ubicación empleo {i+1}",
+                key=f"location_job_{i}",
+                placeholder="Ciudad, País",
+            )
+            
+            col_d1, col_d2, col_d3 = st.columns([1, 1, 1])
+            with col_d3:
+                is_current = st.checkbox(
+                    f"Actualidad {i+1}",
+                    key=f"is_current_{i}",
+                )
+            with col_d1:
+                from_date = st.date_input(
+                    f"Desde {i+1}",
+                    key=f"from_date_{i}",
+                )
+            with col_d2:
+                to_date = st.date_input(
+                    f"Hasta {i+1}",
+                    key=f"to_date_{i}",
+                    disabled=is_current,
+                )
+            desc = st.text_area(
+                f"Responsabilidades / logros {i+1}",
+                key=f"desc_{i}",
+                placeholder="Ej:\n• Análisis de métricas clave.\n• Automatización de reportes en Excel / BI.\n• Mejora de procesos administrativos.",
+                height=120,
+            )
 
-            if profile:
-                lines.append("**Resumen Profesional**")
-                lines.append(profile.strip())
-                lines.append("")
+            experiences.append(
+                {
+                    "role": role,
+                    "company": company,
+                    "location": location_job,
+                    "from_date": from_date,
+                    "to_date": to_date,
+                    "is_current": is_current,
+                    "description": desc,
+                }
+            )
 
-            if experience:
-                lines.append("**Experiencia Profesional**")
-                lines.append(experience.strip())
-                lines.append("")
+        # ----------------- Educación -----------------
+        st.markdown("#### Educación")
+        n_edu = st.number_input(
+            "Cantidad de estudios a incluir",
+            min_value=0,
+            max_value=10,
+            value=1,
+            step=1,
+        )
 
-            if education:
-                lines.append("**Educación**")
-                lines.append(education.strip())
-                lines.append("")
-
-            if projects:
-                lines.append("**Proyectos Relevantes**")
-                lines.append(projects.strip())
-                lines.append("")
-
-            if skills:
-                lines.append("**Habilidades**")
-                # dejamos tal cual, el usuario puede poner comas o viñetas
-                lines.append(skills.strip())
-                lines.append("")
-
-            base_cv_text = "\n".join(lines).strip()
-
-            if not base_cv_text:
-                st.warning("Por favor completa al menos algún campo para generar el CV base.")
-            else:
-                st.session_state["pdf_text_raw"] = base_cv_text
-                st.session_state["pdf_text_clean"] = base_cv_text
-                st.session_state["studies_text_clean"] = ""
-                st.session_state["cv_master"] = None
-                st.session_state["linkedin_profile"] = None
-                st.session_state["cv_target"] = None
-                st.session_state["job_description_raw"] = None
-                st.success("Datos del formulario cargados. Ahora puedes generar el CV Maestro con IA.")
-
-        # Si ya tenemos un CV base desde el formulario, habilitamos el flujo IA
-        if st.session_state.get("pdf_text_clean"):
-
-            st.markdown("### 2) Generar CV Maestro con IA")
-
-            if st.button("Generar CV Maestro desde formulario"):
-                prompt = build_prompt_master(
-                    cv_text=st.session_state["pdf_text_clean"],
-                    new_studies="",  # aquí no hay PDFs de formación adicionales
+        educations = []
+        for i in range(int(n_edu)):
+            st.markdown(f"**Estudio {i+1}**")
+            degree = st.text_input(
+                f"Título / Programa {i+1}",
+                key=f"degree_{i}",
+                placeholder="Ej: Licenciatura en Economía | Diplomatura en Data Science",
+            )
+            institution = st.text_input(
+                f"Institución {i+1}",
+                key=f"institution_{i}",
+                placeholder="Ej: UBA, Coderhouse, etc.",
+            )
+            col_e1, col_e2, col_e3 = st.columns([1, 1, 1])
+            with col_e3:
+                is_current_edu = st.checkbox(
+                    f"En curso {i+1}",
+                    key=f"is_current_edu_{i}",
+                )
+            with col_e1:
+                from_date_edu = st.date_input(
+                    f"Desde {i+1}",
+                    key=f"from_date_edu_{i}",
+                )
+            with col_e2:
+                to_date_edu = st.date_input(
+                    f"Hasta {i+1}",
+                    key=f"to_date_edu_{i}",
+                    disabled=is_current_edu,
                 )
 
-                with st.spinner("Generando CV Maestro con IA..."):
+            educations.append(
+                {
+                    "degree": degree,
+                    "institution": institution,
+                    "from_date": from_date_edu,
+                    "to_date": to_date_edu,
+                    "is_current": is_current_edu,
+                }
+            )
+
+        # ----------------- Proyectos -----------------
+        st.markdown("#### Proyectos (opcional)")
+        n_proj = st.number_input(
+            "Cantidad de proyectos a incluir",
+            min_value=0,
+            max_value=10,
+            value=0,
+            step=1,
+        )
+
+        projects = []
+        for i in range(int(n_proj)):
+            st.markdown(f"**Proyecto {i+1}**")
+            name = st.text_input(
+                f"Nombre del proyecto {i+1}",
+                key=f"proj_name_{i}",
+                placeholder="Ej: Dashboard de Ventas en Power BI",
+            )
+            desc_proj = st.text_area(
+                f"Descripción breve {i+1}",
+                key=f"proj_desc_{i}",
+                placeholder="Describe en 2–3 líneas el objetivo, herramientas y resultado.",
+                height=100,
+            )
+            link = st.text_input(
+                f"Enlace (GitHub, Tableau, Kaggle, etc.) {i+1}",
+                key=f"proj_link_{i}",
+                placeholder="https://...",
+            )
+
+            projects.append(
+                {
+                    "name": name,
+                    "description": desc_proj,
+                    "link": link,
+                }
+            )
+
+        # ----------------- Habilidades -----------------
+        st.markdown("#### Habilidades")
+        skills = st.text_area(
+            "Habilidades técnicas y blandas",
+            placeholder="Ej: Python, SQL, Excel avanzado, Power BI, Comunicación, Trabajo en equipo...",
+            height=100,
+        )
+
+        submitted = st.button("Generar CV Maestro desde formulario")
+
+        # Procesar envío del formulario
+        if submitted:
+            if not full_name or not email:
+                st.warning("Por favor completa al menos el nombre completo y el email.")
+            else:
+                form_data = {
+                    "full_name": full_name,
+                    "email": email,
+                    "phone": phone,
+                    "location": location,
+                    "headline": headline,
+                    "summary": summary,
+                    "experiences": experiences,
+                    "educations": educations,
+                    "projects": projects,
+                    "skills": skills,
+                }
+
+                cv_base_text = build_cv_text_from_form(form_data)
+
+                # Reutilizamos el mismo pipeline que para PDF:
+                st.session_state["pdf_text_raw"] = cv_base_text
+                st.session_state["pdf_text_clean"] = cv_base_text
+                st.session_state["studies_text_clean"] = ""  # sin plan de estudios extra
+                st.session_state["linkedin_profile"] = None
+                st.session_state["cv_target"] = None
+
+                prompt = build_prompt_master(
+                    cv_text=cv_base_text,
+                    new_studies="",  # nada adicional
+                )
+
+                with st.spinner("Generando CV Maestro con IA a partir del formulario..."):
                     cv_master = generate_cv_output(prompt)
 
                 st.session_state["cv_master"] = cv_master
-                st.session_state["linkedin_profile"] = None
-                st.session_state["cv_target"] = None
 
-            # Mostrar CV Maestro
-            if st.session_state.get("cv_master"):
+        # Si ya hay CV Maestro generado desde el formulario, mostramos y permitimos LinkedIn / Target
+        if st.session_state.get("cv_master"):
+            st.markdown("### 2) Resultado: CV Maestro generado")
 
-                st.markdown("### 3) Resultado: CV Maestro generado")
+            st.text_area(
+                label="CV Maestro generado por IA",
+                value=st.session_state["cv_master"],
+                height=400,
+                key="cv_master_output_from_form",
+            )
 
+            # Perfil LinkedIn
+            st.markdown("### 3) Generar versión para LinkedIn")
+
+            if st.button("Generar Perfil LinkedIn (desde formulario)"):
+                prompt_linkedin = build_prompt_linkedin_profile(
+                    master_cv=st.session_state["cv_master"]
+                )
+
+                with st.spinner("Generando perfil LinkedIn con IA..."):
+                    linkedin_profile = generate_cv_output(prompt_linkedin)
+
+                st.session_state["linkedin_profile"] = linkedin_profile
+
+            if st.session_state.get("linkedin_profile"):
                 st.text_area(
-                    label="CV Maestro generado por IA",
-                    value=st.session_state["cv_master"],
+                    label="Perfil LinkedIn generado por IA",
+                    value=st.session_state["linkedin_profile"],
+                    height=350,
+                    key="linkedin_output_from_form",
+                )
+
+            # CV Target
+            st.markdown("### 4) Generar CV orientado a un puesto (CV Target)")
+
+            st.session_state["job_description_raw"] = st.text_area(
+                label="Descripción del puesto objetivo",
+                value=st.session_state.get("job_description_raw") or "",
+                height=220,
+            )
+
+            if st.button("Generar CV Target (desde formulario)"):
+                if not st.session_state["job_description_raw"].strip():
+                    st.warning("Debe pegar la descripción del puesto.")
+                else:
+                    prompt_target = build_prompt_targeted(
+                        master_cv=st.session_state["cv_master"],
+                        job_description=st.session_state["job_description_raw"],
+                    )
+
+                    with st.spinner("Generando CV Target con IA..."):
+                        cv_target = generate_cv_output(prompt_target)
+
+                    st.session_state["cv_target"] = cv_target
+
+            if st.session_state.get("cv_target"):
+                st.text_area(
+                    label="CV Target generado por IA",
+                    value=st.session_state["cv_target"],
                     height=400,
-                    key="cv_master_output_from_form",
+                    key="cv_target_output_from_form",
                 )
-
-                # --------------------------------------------------------------
-                # Perfil LinkedIn
-                # --------------------------------------------------------------
-                st.markdown("### 4) Generar versión para LinkedIn")
-
-                if st.button("Generar Perfil LinkedIn desde CV Maestro"):
-                    prompt_linkedin = build_prompt_linkedin_profile(
-                        master_cv=st.session_state["cv_master"]
-                    )
-
-                    with st.spinner("Generando perfil LinkedIn con IA..."):
-                        linkedin_profile = generate_cv_output(prompt_linkedin)
-
-                    st.session_state["linkedin_profile"] = linkedin_profile
-
-                if st.session_state.get("linkedin_profile"):
-                    st.text_area(
-                        label="Perfil LinkedIn generado por IA",
-                        value=st.session_state["linkedin_profile"],
-                        height=350,
-                        key="linkedin_output_from_form",
-                    )
-
-                # --------------------------------------------------------------
-                # CV Target
-                # --------------------------------------------------------------
-                st.markdown("### 5) Generar CV orientado a un puesto (CV Target)")
-
-                st.session_state["job_description_raw"] = st.text_area(
-                    label="Descripción del puesto objetivo",
-                    value=st.session_state.get("job_description_raw") or "",
-                    height=220,
-                    key="job_description_input_from_form",
-                )
-
-                if st.button("Generar CV Target desde formulario"):
-                    if not st.session_state.get("cv_master"):
-                        st.warning(
-                            "Primero necesita generar un CV Maestro antes de crear un CV Target."
-                        )
-                    elif not st.session_state["job_description_raw"].strip():
-                        st.warning("Debe pegar la descripción del puesto.")
-                    else:
-                        prompt_target = build_prompt_targeted(
-                            master_cv=st.session_state["cv_master"],
-                            job_description=st.session_state["job_description_raw"],
-                        )
-
-                        with st.spinner("Generando CV Target con IA..."):
-                            cv_target = generate_cv_output(prompt_target)
-
-                        st.session_state["cv_target"] = cv_target
-
-                if st.session_state.get("cv_target"):
-                    st.text_area(
-                        label="CV Target generado por IA",
-                        value=st.session_state["cv_target"],
-                        height=400,
-                        key="cv_target_output_from_form",
-                    )
 
 
 if __name__ == "__main__":
