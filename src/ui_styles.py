@@ -87,6 +87,16 @@ def apply_custom_styles():
             transform: translateY(0);
         }
         
+        /* Botón deshabilitado - mantener gradiente con opacidad */
+        .stButton>button:disabled,
+        .stButton>button[disabled] {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            border: none !important;
+        }
+        
         /* ========== Download Buttons ========== */
         .stDownloadButton>button {
             background: linear-gradient(90deg, #27AE60 0%, #229954 100%);

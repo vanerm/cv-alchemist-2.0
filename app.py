@@ -384,8 +384,14 @@ def main():
                     st.session_state["cv_target"] = None
                     st.success("Los PDFs de formación se procesaron correctamente.")
 
-            # Omitir formación y continuar
-            if st.button("➡️ Omitir formación y generar CV Maestro"):
+            # Omitir formación y continuar (solo si no hay formación procesada)
+            has_studies = st.session_state.get("studies_text_clean") not in [None, ""]
+            
+            if st.button(
+                "➡️ Omitir formación y generar CV Maestro",
+                disabled=has_studies,
+                help="Ya se procesaron PDFs de formación" if has_studies else "Continuar sin agregar formación adicional"
+            ):
                 st.session_state["studies_text_clean"] = ""
                 st.session_state["cv_master"] = None
                 st.session_state["linkedin_profile"] = None
