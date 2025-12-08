@@ -3,6 +3,12 @@
 ## [Unreleased] - 2024-12-07
 
 ### ✨ Added
+- **Diseño visual profesional de PDFs** con 4 fases implementadas:
+  1. Tipografía y espaciado mejorado (jerarquía visual clara)
+  2. Colores profesionales y líneas divisorias (paleta azul + grises)
+  3. Iconos simples con Pillow (bullets personalizados)
+  4. Layout optimizado con Platypus (estructura profesional)
+
 - **Validación avanzada de archivos PDF** con 6 validaciones implementadas:
   1. Validación de tamaño de archivo (máx 10MB)
   2. Validación de tipo de archivo real (header `%PDF-`)
@@ -14,11 +20,15 @@
 - Nuevo módulo `src/pdf_validator.py` con clase `PDFValidationResult`
 - Script de pruebas `test_validation.py`
 - Documentación completa en `docs/PDF_VALIDATION.md`
+- Documentación de mejoras de diseño en `docs/PDF_DESIGN_IMPROVEMENTS.md`
+- Dependencia `Pillow` para procesamiento de imágenes e iconos
 
 ### 🔧 Changed
+- `src/pdf_generator.py`: Reescrito completamente con diseño profesional de 4 fases
 - `src/extract_pdf.py`: Funciones ahora retornan tuplas con texto y resultado de validación
 - `app.py`: Función `process_uploaded_pdfs()` integra validaciones y muestra feedback detallado
-- `README.md`: Marcada tarea de validación como completada
+- `requirements.txt`: Agregada dependencia `Pillow`
+- `README.md`: Marcadas tareas de validación y diseño visual como completadas
 
 ### 🐛 Fixed
 - Ordenamiento alfabético de países y ciudades en selectboxes

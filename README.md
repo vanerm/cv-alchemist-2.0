@@ -159,6 +159,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Exportación a PDF de todos los documentos generados
 - [x] Prompts ultra estrictos para evitar alucinaciones de IA
 - [x] Validación avanzada de archivos PDF (tamaño, tipo, protección, contenido)
+- [x] Diseño visual profesional de PDFs (tipografía, colores, iconos, layout)
 
 ---
 
@@ -174,7 +175,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Completar formulario de **CV desde cero** con campos dinámicos
 - [x] Implementar campos de fecha con opción "Actualidad/En curso"
 - [x] Validación avanzada de archivos PDF
-- [ ] Mejorar diseño visual de PDFs generados
+- [x] Mejorar diseño visual de PDFs generados
 - [ ] Agregar templates de CV personalizables
 - [ ] Implementar análisis ATS del CV generado
 - [ ] Mejorar estilo y diseño de la **UI de Streamlit**
