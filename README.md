@@ -57,15 +57,25 @@ cv-alchemist-2.0/
 ├── src/                          # Lógica y módulos internos
 │   ├── extract_pdf.py            # Extracción de texto desde PDF
 │   ├── form_helpers.py           # Formulario dinámico para crear CV desde cero
-│   ├── ai_service.py             # Integración con OpenAI API
+│   ├── form_validators.py        # Validadores de formularios (email, teléfono, URLs)
+│   ├── ai_service.py             # Integración con OpenAI y Gemini APIs
 │   ├── prompts.py                # Prompts optimizados (Maestro, Target, LinkedIn)
 │   ├── pdf_generator.py          # Generación de PDFs con ReportLab
+│   ├── pdf_validator.py          # Validación de archivos PDF
 │   ├── ats_analyzer.py           # Análisis de compatibilidad ATS
 │   ├── cv_templates.py           # Templates personalizables de CV
 │   ├── ui_styles.py              # Estilos CSS personalizados
 │   ├── ui_components.py          # Componentes reutilizables de UI
 │   ├── utils.py                  # Funciones auxiliares
 │   └── __init__.py
+│
+├── tests/                        # Scripts de testing y debugging
+│   ├── test_apis.py              # Prueba de conectividad con APIs
+│   ├── test_memory.py            # Monitor de uso de RAM
+│   ├── test_validation.py        # Prueba de validadores
+│   ├── test_pdf_design.py        # Prueba de generación de PDFs
+│   ├── memory_monitor.py         # Widget opcional de monitoreo
+│   └── README.md                 # Documentación de tests
 │
 ├── docs/                         # Documentación del curso
 │   └── preentrega/
@@ -252,7 +262,8 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Sidebar con indicadores de progreso y estadísticas
 - [x] Botón reiniciar para limpiar sesión
 - [x] Tema visual consistente (lila pastel) en toda la UI
-- [x] Script de prueba de APIs (test_apis.py)
+- [x] Scripts de testing y debugging organizados en carpeta tests/
+- [x] Monitoreo de uso de RAM (183 MB máximo - óptimo para deploy)
 
 ---
 
