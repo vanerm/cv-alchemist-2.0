@@ -7,9 +7,12 @@ Aplicación web con IA desarrollada con **Streamlit** para crear, analizar y opt
 
 CV Alchemist 2.0 es una aplicación interactiva que permite:
 
-- Subir un CV en formato PDF para analizarlo y extraer su contenido.  
-- Crear un CV desde cero mediante un formulario guiado.  
-- Generar un **CV Maestro** y un **CV Optimizado** utilizando modelos de IA (integración pendiente).
+- **Subir un CV existente** en formato PDF para analizarlo y extraer su contenido.  
+- **Crear un CV desde cero** mediante un formulario dinámico con campos de fecha inteligentes.  
+- **Generar un CV Maestro** actualizado integrando nueva formación con IA.  
+- **Crear un Perfil de LinkedIn** optimizado a partir del CV Maestro.  
+- **Generar un CV Target** personalizado para un puesto específico.  
+- **Descargar en PDF** todos los documentos generados (CV Maestro, LinkedIn, CV Target).
 
 El proyecto forma parte del módulo **Prompt Engineering** de CoderHouse y tiene como objetivo aplicar buenas prácticas de diseño de prompts en una aplicación funcional en Python.
 
@@ -26,9 +29,11 @@ Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
 ## 🛠️ Tecnologías Utilizadas
 
 - **Python 3.13**
-- **Streamlit** (interfaz web)
-- **PyPDF2 / pdfplumber** (extracción de texto — pendiente)
-- **OpenAI API / Gemini API** (integración futura)
+- **Streamlit** (interfaz web interactiva)
+- **PyPDF2 / pdfplumber** (extracción de texto desde PDF)
+- **OpenAI API** (generación de CVs con IA)
+- **ReportLab** (generación de PDFs profesionales)
+- **python-dotenv** (gestión de variables de entorno)
 - **Entorno virtual venv**
 - **Git & GitHub**
 
@@ -46,10 +51,11 @@ cv-alchemist-2.0/
 ├── LICENSE                       # Licencia MIT
 │
 ├── src/                          # Lógica y módulos internos
-│   ├── extract_pdf.py            # Extracción de texto desde PDF (to-do)
-│   ├── form_helpers.py           # Formulario para crear CV desde cero
-│   ├── ai_service.py             # Integración futura con APIs de IA
-│   ├── prompts.py                # Construcción de prompts maestro y target
+│   ├── extract_pdf.py            # Extracción de texto desde PDF
+│   ├── form_helpers.py           # Formulario dinámico para crear CV desde cero
+│   ├── ai_service.py             # Integración con OpenAI API
+│   ├── prompts.py                # Prompts optimizados (Maestro, Target, LinkedIn)
+│   ├── pdf_generator.py          # Generación de PDFs con ReportLab
 │   ├── utils.py                  # Funciones auxiliares
 │   └── __init__.py
 │
@@ -101,6 +107,34 @@ streamlit run app.py
 
 ---
 
+## ✨ Funcionalidades Principales
+
+### 📄 Opción 1: Subir CV Existente
+1. **Carga de PDF**: Sube tu CV actual en formato PDF
+2. **Extracción de texto**: Procesamiento automático con pdfplumber
+3. **Agregar formación**: Opcionalmente sube PDFs de nuevos cursos/certificaciones
+4. **Generar CV Maestro**: IA integra la nueva formación manteniendo tu experiencia
+5. **Crear Perfil LinkedIn**: Genera contenido optimizado para LinkedIn
+6. **CV Target**: Personaliza tu CV para un puesto específico
+7. **Descargar PDF**: Exporta cualquier documento generado
+
+### 📝 Opción 2: Crear CV desde Cero
+1. **Formulario dinámico**: Completa tus datos personales
+2. **Experiencia profesional**: Agrega hasta 10 empleos con fechas inteligentes
+3. **Educación**: Incluye hasta 10 estudios con opción "En curso"
+4. **Proyectos**: Destaca hasta 10 proyectos relevantes
+5. **Habilidades**: Lista tus competencias técnicas y blandas
+6. **Generación con IA**: Crea CV Maestro, LinkedIn y CV Target
+7. **Exportación PDF**: Descarga todos los documentos generados
+
+### 🤖 Prompts Inteligentes
+- **Prompt Maestro**: Integra nueva formación sin inventar experiencia
+- **Prompt Target**: Personaliza CV sin alucinaciones, respetando la verdad
+- **Prompt LinkedIn**: Genera perfil profesional optimizado
+- **Anti-alucinaciones**: Reglas estrictas para mantener veracidad
+
+---
+
 ## 🧱 Versión Anterior del Proyecto (MVP – Prompt Engineering I)
 
 Este proyecto es una evolución de la primera versión del MVP desarrollada durante el curso Prompt Engineering I.
@@ -116,31 +150,35 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 
 - [x] Estructura base funcionando  
 - [x] Interfaz Streamlit operativa  
-- [x] Carga de PDF funcional (sin extracción real aún)  
-- [ ] Formulario “Crear CV desde cero” pendiente  
-- [ ] Módulos de IA preparados pero no integrados  
+- [x] Extracción de texto desde PDF con pdfplumber
+- [x] Formulario dinámico "Crear CV desde cero" con campos de fecha inteligentes
+- [x] Integración con OpenAI API para generación de CVs
+- [x] Generación de CV Maestro con IA
+- [x] Generación de Perfil LinkedIn optimizado
+- [x] Generación de CV Target personalizado por puesto
+- [x] Exportación a PDF de todos los documentos generados
+- [x] Prompts ultra estrictos para evitar alucinaciones de IA
 
 ---
 
 ## 🧭 Roadmap / Próximos Pasos
 
-- [ ] Implementar extracción de texto con **pdfplumber**
-- [ ] Validar archivo PDF (formato, permisos, extractabilidad)
-- [ ] Manejo de errores en la extracción (mensajes claros al usuario)
-- [ ] Normalizar y limpiar el texto extraído
-- [ ] Guardar el contenido procesado en session_state
-- [ ] Construir prompts avanzados (CV Maestro y CV Target)
-- [ ] Integrar la API de IA (**OpenAI o Gemini**)
-- [ ] Implementar funciones de IA en ai_service.py
-- [ ] Generar **CV Maestro** automáticamente
-- [ ] Generar **CV Target** según descripción de puesto
-- [ ] Diseñar interfaz para mostrar CV generado y permitir descarga
-- [ ] Exportar resultados descargables (**PDF / TXT**)
-- [ ] Completar formulario de **CV desde cero**
-- [ ] Unificar datos del PDF + formulario
+- [x] Implementar extracción de texto con **pdfplumber**
+- [x] Construir prompts avanzados (CV Maestro, Target y LinkedIn)
+- [x] Integrar la API de IA (**OpenAI**)
+- [x] Generar **CV Maestro** automáticamente
+- [x] Generar **CV Target** según descripción de puesto
+- [x] Generar **Perfil LinkedIn** optimizado
+- [x] Exportar resultados descargables en **PDF**
+- [x] Completar formulario de **CV desde cero** con campos dinámicos
+- [x] Implementar campos de fecha con opción "Actualidad/En curso"
+- [ ] Validación avanzada de archivos PDF
+- [ ] Mejorar diseño visual de PDFs generados
+- [ ] Agregar templates de CV personalizables
+- [ ] Implementar análisis ATS del CV generado
 - [ ] Mejorar estilo y diseño de la **UI de Streamlit**
-- [ ] Deploy de la app en Streamlit Community Cloud (obtener URL pública .streamlit.app)
-- [ ] Actualizar el README con el enlace a la app desplegada
+- [ ] Deploy de la app en Streamlit Community Cloud
+- [ ] Agregar soporte multiidioma
 
 ---
 
@@ -150,10 +188,11 @@ Este proyecto se desarrolla como parte del curso **Prompt Engineering para Progr
 
 El objetivo principal es practicar:
 
-**Diseño y optimización de prompts**
-- **Integración de IA en aplicaciones reales**
-- **Modularización limpia**
-- **Creación rápida de interfaces funcionales con Streamlit**
+- **Diseño y optimización de prompts** con reglas anti-alucinaciones
+- **Integración de IA en aplicaciones reales** (OpenAI API)
+- **Modularización limpia** y arquitectura escalable
+- **Creación de interfaces funcionales** con Streamlit
+- **Generación de documentos** con ReportLab
 
 ---
 
@@ -177,5 +216,3 @@ Me interesa especialmente:
 Actualmente continúo mi especialización a través de la Diplomatura en Data Science [CoderHouse](https://www.coderhouse.com/ar/diplomaturas/data/?pipe_source=google&pipe_medium=cpc&pipe_campaign=1&gad_source=1&gad_campaignid=13952864596&gbraid=0AAAAACoxfTL7S4LjLGDCtBrigIZUvaOtI&gclid=CjwKCAiAxc_JBhA2EiwAFVs7XJlquLs6YOrHV_5FBSUgw11RG-8BGH6YVHXJN2QfehgVqOBGVghiqxoCOQsQAvD_BwE).
 
 🔗 **LinkedIn:** [Vanesa Mizrahi](https://www.linkedin.com/in/vanesamizrahi)
-
-
