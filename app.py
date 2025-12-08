@@ -14,6 +14,16 @@ from src.pdf_generator import generate_pdf
 from src.ats_analyzer import analyze_ats_compatibility, get_score_color, get_score_emoji
 from src.ui_styles import apply_custom_styles, render_header
 from src.ui_components import create_sidebar
+from src.form_validators import (
+    validate_email,
+    validate_phone,
+    validate_name,
+    validate_url,
+    validate_text_length,
+    sanitize_text,
+    validate_company_name,
+    validate_job_title,
+)
 
 
 def process_uploaded_pdfs(files):
@@ -930,20 +940,130 @@ def main():
 
         # Procesar envío del formulario
         if submitted:
-            if not full_name or not email:
-                st.warning("Por favor completa al menos el nombre completo y el email.")
+            # Validaciones
+            errors = []
+            
+            # Validar nombre
+            is_valid, error_msg = validate_name(full_name)
+            if not is_valid:
+                errors.append(f"❌ Nombre: {error_msg}")
+            
+            # Validar email
+            is_valid, error_msg = validate_email(email)
+            if not is_valid:
+                errors.append(f"❌ Email: {error_msg}")
+            
+            # Validar teléfono
+            is_valid, error_msg = validate_phone(phone)
+            if not is_valid:
+                errors.append(f"❌ Teléfono: {error_msg}")
+            
+            # Validar titular
+            is_valid, error_msg = validate_text_length(headline, 0, 200, "Titular profesional")
+            if not is_valid:
+                errors.append(f"❌ {error_msg}")
+            
+            # Validar resumen
+            is_valid, error_msg = validate_text_length(summary, 0, 1000, "Resumen profesional")
+            if not is_valid:
+                errors.append(f"❌ {error_msg}")
+            
+            # Validar experiencias
+            for i, exp in enumerate(experiences, 1):
+                if exp.get("role"):
+                    is_valid, error_msg = validate_job_title(exp["role"])
+                    if not is_valid:
+                        errors.append(f"❌ Puesto {i}: {error_msg}")
+                
+                if exp.get("company"):
+                    is_valid, error_msg = validate_company_name(exp["company"])
+                    if not is_valid:
+                        errors.append(f"❌ Empresa {i}: {error_msg}")
+                
+                if exp.get("description"):
+                    is_valid, error_msg = validate_text_length(exp["description"], 0, 2000, f"Descripción {i}")
+                    if not is_valid:
+                        errors.append(f"❌ {error_msg}")
+            
+            # Validar educación
+            for i, edu in enumerate(educations, 1):
+                if edu.get("degree"):
+                    is_valid, error_msg = validate_text_length(edu["degree"], 0, 200, f"Título {i}")
+                    if not is_valid:
+                        errors.append(f"❌ {error_msg}")
+                
+                if edu.get("institution"):
+                    is_valid, error_msg = validate_text_length(edu["institution"], 0, 200, f"Institución {i}")
+                    if not is_valid:
+                        errors.append(f"❌ {error_msg}")
+            
+            # Validar proyectos
+            for i, proj in enumerate(projects, 1):
+                if proj.get("name"):
+                    is_valid, error_msg = validate_text_length(proj["name"], 0, 200, f"Nombre proyecto {i}")
+                    if not is_valid:
+                        errors.append(f"❌ {error_msg}")
+                
+                if proj.get("link"):
+                    is_valid, error_msg = validate_url(proj["link"])
+                    if not is_valid:
+                        errors.append(f"❌ Proyecto {i} - {error_msg}")
+                
+                if proj.get("description"):
+                    is_valid, error_msg = validate_text_length(proj["description"], 0, 1000, f"Descripción proyecto {i}")
+                    if not is_valid:
+                        errors.append(f"❌ {error_msg}")
+            
+            # Validar habilidades
+            is_valid, error_msg = validate_text_length(skills, 0, 1000, "Habilidades")
+            if not is_valid:
+                errors.append(f"❌ {error_msg}")
+            
+            # Mostrar errores o procesar
+            if errors:
+                st.error("**Por favor corrige los siguientes errores:**")
+                for error in errors:
+                    st.error(error)
             else:
+                # Sanitizar todos los campos de texto
                 form_data = {
-                    "full_name": full_name,
-                    "email": email,
-                    "phone": phone,
-                    "location": location,
-                    "headline": headline,
-                    "summary": summary,
-                    "experiences": experiences,
-                    "educations": educations,
-                    "projects": projects,
-                    "skills": skills,
+                    "full_name": sanitize_text(full_name),
+                    "email": sanitize_text(email),
+                    "phone": sanitize_text(phone),
+                    "location": sanitize_text(location),
+                    "headline": sanitize_text(headline),
+                    "summary": sanitize_text(summary),
+                    "experiences": [
+                        {
+                            "role": sanitize_text(exp.get("role", "")),
+                            "company": sanitize_text(exp.get("company", "")),
+                            "location": sanitize_text(exp.get("location", "")),
+                            "from_date": exp.get("from_date"),
+                            "to_date": exp.get("to_date"),
+                            "is_current": exp.get("is_current", False),
+                            "description": sanitize_text(exp.get("description", "")),
+                        }
+                        for exp in experiences
+                    ],
+                    "educations": [
+                        {
+                            "degree": sanitize_text(edu.get("degree", "")),
+                            "institution": sanitize_text(edu.get("institution", "")),
+                            "from_date": edu.get("from_date"),
+                            "to_date": edu.get("to_date"),
+                            "is_current": edu.get("is_current", False),
+                        }
+                        for edu in educations
+                    ],
+                    "projects": [
+                        {
+                            "name": sanitize_text(proj.get("name", "")),
+                            "description": sanitize_text(proj.get("description", "")),
+                            "link": sanitize_text(proj.get("link", "")),
+                        }
+                        for proj in projects
+                    ],
+                    "skills": sanitize_text(skills),
                 }
 
                 cv_base_text = build_cv_text_from_form(form_data)
