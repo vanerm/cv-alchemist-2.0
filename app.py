@@ -856,7 +856,7 @@ def main():
             desc = st.text_area(
                 f"Responsabilidades / logros {i+1}",
                 key=f"desc_{i}",
-                placeholder="Ej:\n• Análisis de métricas clave.\n• Automatización de reportes en Excel / BI.\n• Mejora de procesos administrativos.",
+                placeholder="Ej:\n• Análisis de métricas clave del área.\n• Automatización de reportes y procesos.\n• Mejora de procedimientos operativos.",
                 height=120,
             )
 
@@ -939,7 +939,7 @@ def main():
             name = st.text_input(
                 f"Nombre del proyecto {i+1}",
                 key=f"proj_name_{i}",
-                placeholder="Ej: Dashboard de Ventas en Power BI",
+                placeholder="Ej: Sistema de reportes, Análisis de datos, etc.",
             )
             desc_proj = st.text_area(
                 f"Descripción breve {i+1}",
@@ -965,7 +965,7 @@ def main():
         st.markdown("#### Habilidades")
         skills = st.text_area(
             "Habilidades técnicas y blandas",
-            placeholder="Ej: Python, SQL, Excel avanzado, Power BI, Comunicación, Trabajo en equipo...",
+            placeholder="Ej: Herramientas técnicas relevantes, software especializado, habilidades blandas...",
             height=100,
         )
 

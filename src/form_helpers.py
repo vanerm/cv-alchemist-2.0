@@ -150,9 +150,9 @@ def get_cv_form_data() -> str | None:
             key=f"form_resp_{i}",
             placeholder=(
                 "Ej:\n"
-                "• Análisis de métricas clave.\n"
-                "• Automatización de reportes en Excel / BI.\n"
-                "• Mejora de procesos administrativos."
+                "• Análisis de métricas clave del área.\n"
+                "• Automatización de reportes y procesos.\n"
+                "• Mejora de procedimientos operativos."
             ),
             height=120,
         )
@@ -279,7 +279,7 @@ def get_cv_form_data() -> str | None:
         "Habilidades técnicas y blandas",
         key="form_habilidades",
         placeholder=(
-            "Ej: Python, SQL, Excel avanzado, Power BI, Comunicación, Trabajo en equipo..."
+            "Ej: Herramientas técnicas relevantes, software especializado, habilidades blandas..."
         ),
         height=100,
     )

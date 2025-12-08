@@ -74,6 +74,15 @@ Debes evaluar los siguientes criterios y proporcionar un análisis detallado:
 - ¿Hay suficiente densidad de términos técnicos sin keyword stuffing?
 {"- ¿Coincide con los requisitos técnicos del puesto?" if job_description else ""}
 
+**IMPORTANTE PARA PALABRAS CLAVE:**
+- Considera TODAS las variaciones y acrónimos comunes de términos técnicos
+- Ejemplos de equivalencias: palabra completa = minúsculas = acrónimo = traducción
+- Busca la palabra en TODO el CV (experiencia, proyectos, habilidades, educación)
+- Si encuentras el acrónimo de una palabra, considera que la palabra completa SÍ está presente
+- Si una palabra aparece en CUALQUIER sección del CV, NO la marques como faltante
+- Solo marca como faltante si ni la palabra completa NI su acrónimo aparecen en el CV
+- PRIORIZA contexto de experiencia/proyectos, pero ACEPTA también si está en habilidades
+
 **3. CONTENIDO Y CLARIDAD (20 puntos)**
 - ¿La experiencia está bien descrita con logros cuantificables?
 - ¿Las fechas están en formato estándar?
@@ -83,7 +92,7 @@ Debes evaluar los siguientes criterios y proporcionar un análisis detallado:
 **4. OPTIMIZACIÓN ATS (15 puntos)**
 - ¿Usa verbos de acción al inicio de las descripciones?
 - ¿Evita abreviaturas no estándar?
-- ¿Incluye tanto acrónimos como términos completos? (ej: "ML (Machine Learning)")
+- ¿Incluye tanto acrónimos como términos completos cuando corresponde?
 - ¿Las habilidades están listadas claramente?
 
 FORMATO DE RESPUESTA OBLIGATORIO:
@@ -98,8 +107,14 @@ FORMATO DE RESPUESTA OBLIGATORIO:
 - palabra3
 
 **PALABRAS_CLAVE_FALTANTES:**
-- palabra1 (contexto: dónde debería aparecer)
-- palabra2 (contexto: dónde debería aparecer)
+- palabra1 (sugerencia: agregar en experiencia/proyectos con ejemplo concreto)
+- palabra2 (sugerencia: agregar en experiencia/proyectos con ejemplo concreto)
+
+NOTAS IMPORTANTES:
+1. Solo incluye palabras que NO aparecen en el CV (ni como palabra completa ni como acrónimo)
+2. Si la palabra está en habilidades pero NO en experiencia/proyectos, NO la marques como faltante
+3. En su lugar, menciona en RECOMENDACIONES que sería mejor incluir ejemplos prácticos de uso
+4. Si encuentras el acrónimo de una palabra clave en cualquier parte del CV, NO la marques como faltante
 
 **FORTALEZAS:**
 - Fortaleza 1
