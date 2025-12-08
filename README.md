@@ -12,6 +12,7 @@ CV Alchemist 2.0 es una aplicación interactiva que permite:
 - **Generar un CV Maestro** actualizado integrando nueva formación con IA.  
 - **Crear un Perfil de LinkedIn** optimizado a partir del CV Maestro.  
 - **Generar un CV Target** personalizado para un puesto específico.  
+- **Analizar compatibilidad ATS** del CV generado con scoring y recomendaciones.
 - **Descargar en PDF** todos los documentos generados (CV Maestro, LinkedIn, CV Target).
 
 El proyecto forma parte del módulo **Prompt Engineering** de CoderHouse y tiene como objetivo aplicar buenas prácticas de diseño de prompts en una aplicación funcional en Python.
@@ -56,6 +57,8 @@ cv-alchemist-2.0/
 │   ├── ai_service.py             # Integración con OpenAI API
 │   ├── prompts.py                # Prompts optimizados (Maestro, Target, LinkedIn)
 │   ├── pdf_generator.py          # Generación de PDFs con ReportLab
+│   ├── ats_analyzer.py           # Análisis de compatibilidad ATS
+│   ├── cv_templates.py           # Templates personalizables de CV
 │   ├── utils.py                  # Funciones auxiliares
 │   └── __init__.py
 │
@@ -116,7 +119,8 @@ streamlit run app.py
 4. **Generar CV Maestro**: IA integra la nueva formación manteniendo tu experiencia
 5. **Crear Perfil LinkedIn**: Genera contenido optimizado para LinkedIn
 6. **CV Target**: Personaliza tu CV para un puesto específico
-7. **Descargar PDF**: Exporta cualquier documento generado
+7. **Análisis ATS**: Evalúa compatibilidad con sistemas de filtrado automático
+8. **Descargar PDF**: Exporta cualquier documento generado
 
 ### 📝 Opción 2: Crear CV desde Cero
 1. **Formulario dinámico**: Completa tus datos personales
@@ -125,12 +129,14 @@ streamlit run app.py
 4. **Proyectos**: Destaca hasta 10 proyectos relevantes
 5. **Habilidades**: Lista tus competencias técnicas y blandas
 6. **Generación con IA**: Crea CV Maestro, LinkedIn y CV Target
-7. **Exportación PDF**: Descarga todos los documentos generados
+7. **Análisis ATS**: Score y recomendaciones para optimizar tu CV
+8. **Exportación PDF**: Descarga todos los documentos generados
 
 ### 🤖 Prompts Inteligentes
 - **Prompt Maestro**: Integra nueva formación sin inventar experiencia
 - **Prompt Target**: Personaliza CV sin alucinaciones, respetando la verdad
 - **Prompt LinkedIn**: Genera perfil profesional optimizado
+- **Prompt ATS**: Analiza compatibilidad con sistemas de reclutamiento
 - **Anti-alucinaciones**: Reglas estrictas para mantener veracidad
 
 ---
@@ -161,6 +167,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Validación avanzada de archivos PDF (tamaño, tipo, protección, contenido)
 - [x] Diseño visual profesional de PDFs (tipografía, colores, iconos, layout)
 - [x] Templates personalizables (Clásico, Moderno, Minimalista, Creativo)
+- [x] Análisis ATS con scoring, palabras clave y recomendaciones
 
 ---
 
@@ -178,7 +185,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Validación avanzada de archivos PDF
 - [x] Mejorar diseño visual de PDFs generados
 - [x] Agregar templates de CV personalizables
-- [ ] Implementar análisis ATS del CV generado
+- [x] Implementar análisis ATS del CV generado
 - [ ] Mejorar estilo y diseño de la **UI de Streamlit**
 - [ ] Deploy de la app en Streamlit Community Cloud
 - [ ] Agregar soporte multiidioma

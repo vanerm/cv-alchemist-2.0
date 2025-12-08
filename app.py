@@ -11,6 +11,7 @@ from src.prompts import (
     build_prompt_linkedin_profile,
 )
 from src.pdf_generator import generate_pdf
+from src.ats_analyzer import analyze_ats_compatibility, get_score_color, get_score_emoji
 
 
 def process_uploaded_pdfs(files):
@@ -505,6 +506,101 @@ def main():
                         file_name="cv_target.pdf",
                         mime="application/pdf",
                     )
+                    
+                    # ==============================================================
+                    # 🟦 Análisis ATS del CV Target
+                    # ==============================================================
+                    st.markdown("---")
+                    st.markdown("### 🔍 Análisis de Compatibilidad ATS")
+                    st.caption("Evalúa qué tan bien tu CV pasará los sistemas de filtrado automático")
+                    
+                    if st.button("🔍 Analizar Compatibilidad ATS", key="analyze_ats_target"):
+                        with st.spinner("Analizando compatibilidad ATS del CV Target..."):
+                            ats_result = analyze_ats_compatibility(
+                                cv_content=st.session_state["cv_target"],
+                                job_description=st.session_state.get("job_description_raw", "")
+                            )
+                            st.session_state["ats_analysis"] = ats_result
+                    
+                    # Mostrar resultados del análisis ATS
+                    if st.session_state.get("ats_analysis"):
+                        ats = st.session_state["ats_analysis"]
+                        score = ats.get("score", 0)
+                        
+                        # Score principal con color
+                        col_score, col_level = st.columns([1, 2])
+                        with col_score:
+                            st.metric(
+                                "Score ATS",
+                                f"{score}/100",
+                                delta=None
+                            )
+                        with col_level:
+                            emoji = get_score_emoji(score)
+                            st.markdown(f"### {emoji} {ats.get('level', 'N/A')}")
+                        
+                        # Barra de progreso
+                        st.progress(score / 100)
+                        
+                        # Fortalezas y Debilidades
+                        col_str, col_weak = st.columns(2)
+                        
+                        with col_str:
+                            st.markdown("**✅ Fortalezas**")
+                            strengths = ats.get("strengths", [])
+                            if strengths:
+                                for strength in strengths:
+                                    st.success(f"• {strength}")
+                            else:
+                                st.info("No se identificaron fortalezas específicas")
+                        
+                        with col_weak:
+                            st.markdown("**⚠️ Debilidades**")
+                            weaknesses = ats.get("weaknesses", [])
+                            if weaknesses:
+                                for weakness in weaknesses:
+                                    st.warning(f"• {weakness}")
+                            else:
+                                st.info("No se identificaron debilidades críticas")
+                        
+                        # Palabras clave
+                        st.markdown("**🔑 Análisis de Palabras Clave**")
+                        col_found, col_missing = st.columns(2)
+                        
+                        with col_found:
+                            st.markdown("*Encontradas:*")
+                            kw_found = ats.get("keywords_found", [])
+                            if kw_found:
+                                st.write(", ".join(kw_found[:10]))  # Mostrar primeras 10
+                            else:
+                                st.caption("No especificadas")
+                        
+                        with col_missing:
+                            st.markdown("*Faltantes:*")
+                            kw_missing = ats.get("keywords_missing", [])
+                            if kw_missing:
+                                for kw in kw_missing[:5]:  # Mostrar primeras 5
+                                    st.error(f"• {kw}")
+                            else:
+                                st.success("✓ Todas las palabras clave presentes")
+                        
+                        # Recomendaciones
+                        st.markdown("**💡 Recomendaciones de Mejora**")
+                        recommendations = ats.get("recommendations", [])
+                        if recommendations:
+                            for i, rec in enumerate(recommendations, 1):
+                                st.info(f"{i}. {rec}")
+                        else:
+                            st.success("✓ No se requieren mejoras adicionales")
+                        
+                        # Detalles por criterio (expandible)
+                        with st.expander("📊 Ver detalles por criterio"):
+                            details = ats.get("details", {})
+                            if details:
+                                for criterion, detail in details.items():
+                                    st.markdown(f"**{criterion}:** {detail}")
+                            else:
+                                st.caption("No hay detalles adicionales disponibles")
 
         else:
             st.info("Una vez procesado el PDF del CV, se habilitarán los pasos siguientes.")
@@ -917,6 +1013,101 @@ def main():
                     file_name="cv_target.pdf",
                     mime="application/pdf",
                 )
+                
+                # ==============================================================
+                # 🟦 Análisis ATS del CV Target (desde formulario)
+                # ==============================================================
+                st.markdown("---")
+                st.markdown("### 🔍 Análisis de Compatibilidad ATS")
+                st.caption("Evalúa qué tan bien tu CV pasará los sistemas de filtrado automático")
+                
+                if st.button("🔍 Analizar Compatibilidad ATS", key="analyze_ats_form"):
+                    with st.spinner("Analizando compatibilidad ATS del CV Target..."):
+                        ats_result = analyze_ats_compatibility(
+                            cv_content=st.session_state["cv_target"],
+                            job_description=st.session_state.get("job_description_raw", "")
+                        )
+                        st.session_state["ats_analysis_form"] = ats_result
+                
+                # Mostrar resultados del análisis ATS
+                if st.session_state.get("ats_analysis_form"):
+                    ats = st.session_state["ats_analysis_form"]
+                    score = ats.get("score", 0)
+                    
+                    # Score principal con color
+                    col_score, col_level = st.columns([1, 2])
+                    with col_score:
+                        st.metric(
+                            "Score ATS",
+                            f"{score}/100",
+                            delta=None
+                        )
+                    with col_level:
+                        emoji = get_score_emoji(score)
+                        st.markdown(f"### {emoji} {ats.get('level', 'N/A')}")
+                    
+                    # Barra de progreso
+                    st.progress(score / 100)
+                    
+                    # Fortalezas y Debilidades
+                    col_str, col_weak = st.columns(2)
+                    
+                    with col_str:
+                        st.markdown("**✅ Fortalezas**")
+                        strengths = ats.get("strengths", [])
+                        if strengths:
+                            for strength in strengths:
+                                st.success(f"• {strength}")
+                        else:
+                            st.info("No se identificaron fortalezas específicas")
+                    
+                    with col_weak:
+                        st.markdown("**⚠️ Debilidades**")
+                        weaknesses = ats.get("weaknesses", [])
+                        if weaknesses:
+                            for weakness in weaknesses:
+                                st.warning(f"• {weakness}")
+                        else:
+                            st.info("No se identificaron debilidades críticas")
+                    
+                    # Palabras clave
+                    st.markdown("**🔑 Análisis de Palabras Clave**")
+                    col_found, col_missing = st.columns(2)
+                    
+                    with col_found:
+                        st.markdown("*Encontradas:*")
+                        kw_found = ats.get("keywords_found", [])
+                        if kw_found:
+                            st.write(", ".join(kw_found[:10]))  # Mostrar primeras 10
+                        else:
+                            st.caption("No especificadas")
+                    
+                    with col_missing:
+                        st.markdown("*Faltantes:*")
+                        kw_missing = ats.get("keywords_missing", [])
+                        if kw_missing:
+                            for kw in kw_missing[:5]:  # Mostrar primeras 5
+                                st.error(f"• {kw}")
+                        else:
+                            st.success("✓ Todas las palabras clave presentes")
+                    
+                    # Recomendaciones
+                    st.markdown("**💡 Recomendaciones de Mejora**")
+                    recommendations = ats.get("recommendations", [])
+                    if recommendations:
+                        for i, rec in enumerate(recommendations, 1):
+                            st.info(f"{i}. {rec}")
+                    else:
+                        st.success("✓ No se requieren mejoras adicionales")
+                    
+                    # Detalles por criterio (expandible)
+                    with st.expander("📊 Ver detalles por criterio"):
+                        details = ats.get("details", {})
+                        if details:
+                            for criterion, detail in details.items():
+                                st.markdown(f"**{criterion}:** {detail}")
+                        else:
+                            st.caption("No hay detalles adicionales disponibles")
 
 
 if __name__ == "__main__":

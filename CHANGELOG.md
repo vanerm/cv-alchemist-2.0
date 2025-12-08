@@ -1,66 +1,66 @@
 # Changelog - CV Alchemist 2.0
 
-## [Unreleased] - 2024-12-07
+## [Unreleased] - 2025
 
-### ✨ Added
-- **Diseño visual profesional de PDFs** con 4 fases implementadas:
-  1. Tipografía y espaciado mejorado (jerarquía visual clara)
-  2. Colores profesionales y líneas divisorias (paleta azul + grises)
-  3. Iconos simples con Pillow (bullets personalizados)
-  4. Layout optimizado con Platypus (estructura profesional)
+### ✨ Added - Análisis ATS
+- **Nuevo módulo `ats_analyzer.py`**: Sistema completo de análisis de compatibilidad ATS
+- **Prompt especializado**: Evaluación con IA de 4 criterios principales (Formato, Palabras Clave, Contenido, Optimización)
+- **Scoring 0-100**: Métrica clara de compatibilidad con sistemas de reclutamiento
+- **Análisis de palabras clave**: Identificación de términos encontrados vs faltantes
+- **Recomendaciones accionables**: Sugerencias específicas para mejorar el CV
+- **Integración en UI**: Sección de análisis ATS después de generar CV Target
+- **Visualización completa**: Score, nivel, fortalezas, debilidades, palabras clave y recomendaciones
+- **Documentación ATS**: Guía completa en `docs/ATS_ANALYSIS.md`
 
-- **Validación avanzada de archivos PDF** con 6 validaciones implementadas:
-  1. Validación de tamaño de archivo (máx 10MB)
-  2. Validación de tipo de archivo real (header `%PDF-`)
-  3. Detección de PDFs protegidos con contraseña
-  4. Detección de PDFs corruptos o dañados
-  5. Validación de contenido extraíble (detección de PDFs escaneados)
-  6. Feedback visual con metadata (páginas, caracteres, tamaño)
+### 🎨 Added - Templates Personalizables
+- **Nuevo módulo `cv_templates.py`**: Sistema de templates con configuración visual
+- **4 templates profesionales**:
+  - Clásico: Formal y tradicional (máxima compatibilidad ATS)
+  - Moderno: Profesional y actual (tech/startups)
+  - Minimalista: Limpio y espacioso (diseño/UX)
+  - Creativo: Vibrante y llamativo (marketing/publicidad)
+- **Selector de templates**: UI para elegir estilo en cada exportación PDF
+- **Configuración por template**: Colores, fuentes, tamaños, espaciado, divisores
 
-- Nuevo módulo `src/pdf_validator.py` con clase `PDFValidationResult`
-- Script de pruebas `test_validation.py`
-- Documentación completa en `docs/PDF_VALIDATION.md`
-- Documentación de mejoras de diseño en `docs/PDF_DESIGN_IMPROVEMENTS.md`
-- Dependencia `Pillow` para procesamiento de imágenes e iconos
+### 🔧 Modified
+- **app.py**: Integración de análisis ATS en ambos flujos (subir CV y crear desde cero)
+- **README.md**: Actualización con nueva funcionalidad ATS y templates
+- **Estructura del proyecto**: Nuevos módulos documentados
 
-### 🔧 Changed
-- `src/pdf_generator.py`: Reescrito completamente con diseño profesional de 4 fases
-- `src/extract_pdf.py`: Funciones ahora retornan tuplas con texto y resultado de validación
-- `app.py`: Función `process_uploaded_pdfs()` integra validaciones y muestra feedback detallado
-- `requirements.txt`: Agregada dependencia `Pillow`
-- `README.md`: Marcadas tareas de validación y diseño visual como completadas
-
-### 🐛 Fixed
-- Ordenamiento alfabético de países y ciudades en selectboxes
-- Error `UnboundLocalError` al usar variables `paises` y `ciudades_por_pais` antes de definirlas
-- Error `ValueError` en generación de PDF por caracteres especiales mal escapados
-
-### 📝 Documentation
-- Agregado `CHANGELOG.md` para tracking de cambios
-- Agregado `docs/PDF_VALIDATION.md` con documentación técnica completa
+### 📚 Documentation
+- **ATS_ANALYSIS.md**: Guía completa sobre análisis ATS
+  - Explicación de criterios de evaluación
+  - Interpretación de scores
+  - Mejores prácticas y casos de uso
+  - FAQ y recursos adicionales
 
 ---
 
-## [Previous] - 2024-12-06
+## [2.0.0] - 2025-01
 
 ### ✨ Added
-- Exportación a PDF de CV Maestro, LinkedIn y CV Target con ReportLab
-- Selectboxes de país y ciudad con 15 países latinoamericanos
-- Campos de fecha con `st.date_input` y checkbox "Actualidad/En curso"
-- Formulario dinámico "Crear CV desde cero" con hasta 10 entradas por sección
+- Formulario dinámico "Crear CV desde cero"
+- Campos de fecha inteligentes con opción "Actualidad/En curso"
+- Generación de CV Maestro con IA
+- Generación de Perfil LinkedIn optimizado
+- Generación de CV Target personalizado
+- Exportación a PDF de todos los documentos
+- Validación avanzada de archivos PDF (6 capas de seguridad)
+- Diseño visual profesional de PDFs (tipografía, colores, iconos)
 - Prompts ultra estrictos anti-alucinaciones
 
-### 🔧 Changed
-- Removido `st.form()` para permitir actualización dinámica de UI
-- Aumentado límite de entradas de 3 a 10 para empleos, educación y proyectos
+### 🔧 Modified
+- Refactorización de `build_prompt_targeted`
+- Mejora de extracción de texto con pdfplumber
+- Optimización de generación de PDFs con ReportLab
 
 ---
 
-## [Initial] - 2024-12-05
+## [1.0.0] - 2024
 
-### ✨ Added
+### ✨ Initial Release
 - Estructura base del proyecto
+- Interfaz Streamlit operativa
+- Extracción de texto desde PDF
 - Integración con OpenAI API
-- Extracción de texto desde PDF con pdfplumber
-- Generación de CV Maestro, LinkedIn Profile y CV Target
-- Interfaz Streamlit con dos flujos principales
+- Prompts básicos para CV Maestro y Target
