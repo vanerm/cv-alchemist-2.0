@@ -299,6 +299,10 @@ def main():
         "Aplicación con IA para crear y optimizar CVs profesionales"
     )
 
+    # Importar templates antes de los flujos
+    from src.cv_templates import get_template_names, get_template_by_display_name
+    template_names = get_template_names()
+    
     # Selección de modo con botón de reiniciar
     col_title, col_reset = st.columns([5, 1], gap="small")
     
@@ -424,8 +428,6 @@ def main():
                 )
                 
                 # Selector de template
-                from src.cv_templates import get_template_names, get_template_by_display_name
-                template_names = get_template_names()
                 selected_template = st.selectbox(
                     "🎨 Selecciona un template para el PDF",
                     template_names,
