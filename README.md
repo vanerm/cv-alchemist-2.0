@@ -32,7 +32,8 @@ Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
 - **Python 3.13**
 - **Streamlit** (interfaz web interactiva)
 - **PyPDF2 / pdfplumber** (extracción de texto desde PDF)
-- **OpenAI API** (generación de CVs con IA)
+- **OpenAI API** (generación de CVs con IA - primaria)
+- **Google Gemini API** (fallback automático)
 - **ReportLab** (generación de PDFs profesionales)
 - **python-dotenv** (gestión de variables de entorno)
 - **Entorno virtual venv**
@@ -100,10 +101,24 @@ pip install -r requirements.txt
 ```
 
 ### **5. Configurar variables de entorno**
-Crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
+Crear un archivo `.env` en la raíz del proyecto:
+```bash
+# API Primaria (OpenAI)
+OPENAI_API_KEY=tu_openai_api_key_aqui
+OPENAI_MODEL=gpt-4o-mini
+
+# API Fallback (Gemini) - Opcional
+GEMINI_API_KEY=tu_gemini_api_key_aqui
+GEMINI_MODEL=gemini-1.5-flash
 ```
-OPENAI_API_KEY=tu_api_key_aqui
-```
+
+**Notas:**
+- El sistema usa OpenAI por defecto
+- Si OpenAI falla (límite excedido, error), automáticamente usa Gemini
+- Puedes configurar solo una API key si prefieres
+- Obtén las keys en:
+  - OpenAI: https://platform.openai.com/api-keys
+  - Gemini: https://makersuite.google.com/app/apikey
 ### **6. Ejecutar la aplicación**
 ```bash
 streamlit run app.py
@@ -161,6 +176,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Extracción de texto desde PDF con pdfplumber
 - [x] Formulario dinámico "Crear CV desde cero" con campos de fecha inteligentes
 - [x] Integración con OpenAI API para generación de CVs
+- [x] Fallback automático a Gemini API si OpenAI falla
 - [x] Generación de CV Maestro con IA
 - [x] Generación de Perfil LinkedIn optimizado
 - [x] Generación de CV Target personalizado por puesto

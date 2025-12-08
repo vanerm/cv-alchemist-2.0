@@ -6,3 +6,4 @@ pdfplumber
 langchain>=0.0.148
 reportlab
 Pillow
+google-generativeai
