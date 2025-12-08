@@ -188,7 +188,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Mejorar diseño visual de PDFs generados
 - [x] Agregar templates de CV personalizables
 - [x] Implementar análisis ATS del CV generado
-- [ ] Mejorar estilo y diseño de la **UI de Streamlit**
+- [x] Mejorar estilo y diseño de la **UI de Streamlit**
 - [ ] Deploy de la app en Streamlit Community Cloud
 - [ ] Agregar soporte multiidioma
 
