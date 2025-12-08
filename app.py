@@ -12,6 +12,8 @@ from src.prompts import (
 )
 from src.pdf_generator import generate_pdf
 from src.ats_analyzer import analyze_ats_compatibility, get_score_color, get_score_emoji
+from src.ui_styles import apply_custom_styles, render_header
+from src.ui_components import create_sidebar
 
 
 def process_uploaded_pdfs(files):
@@ -265,7 +267,18 @@ def build_cv_text_from_form(data: dict) -> str:
 
 def main():
     """Función principal de la aplicación CV Alchemist 2.0."""
-    st.set_page_config(page_title="CV Alchemist 2.0", layout="centered")
+    st.set_page_config(
+        page_title="CV Alchemist 2.0",
+        page_icon="🧪",
+        layout="centered",
+        initial_sidebar_state="expanded"
+    )
+
+    # Aplicar estilos personalizados
+    apply_custom_styles()
+    
+    # Crear sidebar
+    create_sidebar()
 
     # Manejo de session_state
     for key in [
@@ -280,15 +293,19 @@ def main():
         if key not in st.session_state:
             st.session_state[key] = None
 
-    # Encabezado
-    st.title("CV Alchemist 2.0")
-    st.subheader("Aplicación con IA para crear y optimizar CVs")
+    # Encabezado con estilo
+    render_header(
+        "CV Alchemist 2.0",
+        "Aplicación con IA para crear y optimizar CVs profesionales"
+    )
 
     # Selección de modo
+    st.markdown("### ¿Qué desea hacer?")
     option = st.radio(
-        "¿Qué desea hacer?",
+        "Seleccione una opción:",
         ["Subir un CV existente (PDF)", "Crear CV desde cero"],
         key="mode_selection",
+        label_visibility="collapsed"
     )
 
     # ==========================================================================

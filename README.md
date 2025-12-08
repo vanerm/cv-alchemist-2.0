@@ -59,6 +59,8 @@ cv-alchemist-2.0/
 │   ├── pdf_generator.py          # Generación de PDFs con ReportLab
 │   ├── ats_analyzer.py           # Análisis de compatibilidad ATS
 │   ├── cv_templates.py           # Templates personalizables de CV
+│   ├── ui_styles.py              # Estilos CSS personalizados
+│   ├── ui_components.py          # Componentes reutilizables de UI
 │   ├── utils.py                  # Funciones auxiliares
 │   └── __init__.py
 │
