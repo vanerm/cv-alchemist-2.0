@@ -190,7 +190,6 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Implementar análisis ATS del CV generado
 - [x] Mejorar estilo y diseño de la **UI de Streamlit**
 - [ ] Deploy de la app en Streamlit Community Cloud
-- [ ] Agregar soporte multiidioma
 
 ---
 
