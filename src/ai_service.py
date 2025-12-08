@@ -27,7 +27,7 @@ from openai import OpenAI
 load_dotenv()
 
 # Modelo por defecto. El lector puede cambiarlo vía variable de entorno.
-DEFAULT_MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-5.1")
+DEFAULT_MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 # Cliente global reutilizable.
 _client: Optional[OpenAI] = None
