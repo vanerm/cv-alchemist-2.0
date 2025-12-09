@@ -324,11 +324,14 @@ def main():
         if st.button("🔄 Reiniciar", key="reset_button", help="Borrar todo y empezar de cero"):
             # Incrementar contador de reset para forzar recreación de file uploaders
             reset_count = st.session_state.get("reset_count", 0)
+            # Guardar la selección actual del modo antes de limpiar
+            current_mode = st.session_state.get("mode_selection", "Subir un CV existente (PDF)")
             # Limpiar todo el session_state
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
-            # Restaurar contador incrementado
+            # Restaurar contador incrementado y modo seleccionado
             st.session_state["reset_count"] = reset_count + 1
+            st.session_state["mode_selection"] = current_mode
             st.rerun()
     
     # Inicializar contador de reset si no existe
@@ -341,6 +344,26 @@ def main():
         key="mode_selection",
         label_visibility="collapsed"
     )
+    
+    # Detectar cambio de modo y limpiar datos para evitar inconsistencias
+    if "previous_mode" not in st.session_state:
+        st.session_state["previous_mode"] = option
+    
+    if st.session_state["previous_mode"] != option:
+        # El usuario cambió de modo, limpiar datos
+        keys_to_clear = [
+            "pdf_text_raw", "pdf_text_clean", "studies_text_clean",
+            "cv_master", "linkedin_profile", "cv_target", "job_description_raw",
+            "ats_analysis", "ats_analysis_form",
+            "show_success_pdf", "show_success_studies", "show_success_form",
+            "show_success_studies_form", "show_info_skip", "show_info_skip_form"
+        ]
+        for key in keys_to_clear:
+            if key in st.session_state:
+                del st.session_state[key]
+        
+        st.session_state["previous_mode"] = option
+        st.rerun()
 
     # ==========================================================================
     # 🟦 OPCIÓN 1 — Subir CV existente
