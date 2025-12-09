@@ -156,26 +156,38 @@ Para probar la aplicación, puedes usar estos archivos de ejemplo:
 
 ## ✨ Funcionalidades Principales
 
+### 🔄 Flujo Unificado (Ambas Opciones)
+Ambas opciones siguen la misma estructura de 6 pasos:
+
+1. **Paso 1**: Subir CV existente (PDF) O Completar formulario manual
+2. **Paso 2**: Agregar formación adicional (opcional) - PDFs de cursos/certificaciones
+3. **Paso 3**: Generar CV Maestro con IA (integra datos + formación)
+4. **Paso 4**: Crear Perfil LinkedIn optimizado
+5. **Paso 5**: Generar CV Target personalizado para un puesto
+6. **Paso 6**: Análisis ATS con scoring y recomendaciones
+
 ### 📄 Opción 1: Subir CV Existente
-1. **Carga de PDF**: Sube tu CV actual en formato PDF con validación avanzada
-2. **Extracción de texto**: Procesamiento automático con pdfplumber
-3. **Agregar formación**: Opcionalmente sube PDFs de nuevos cursos/certificaciones
-4. **Generar CV Maestro**: IA integra la nueva formación manteniendo tu experiencia
-5. **Crear Perfil LinkedIn**: Genera contenido optimizado para LinkedIn
-6. **CV Target**: Personaliza tu CV para un puesto específico
-7. **Análisis ATS**: Evalúa compatibilidad con sistemas de filtrado automático
-8. **Descargar PDF**: Exporta cualquier documento con el template elegido
+- **Carga de PDF**: Sube tu CV actual en formato PDF con validación avanzada
+- **Extracción de texto**: Procesamiento automático con pdfplumber
+- **Validación robusta**: Tamaño, tipo, protección y contenido legible
+- **Metadata**: Información detallada del PDF procesado
 
 ### 📝 Opción 2: Crear CV desde Cero
-1. **Formulario dinámico**: Completa tus datos personales con validación en tiempo real
-2. **Experiencia profesional**: Agrega hasta 10 empleos con fechas inteligentes
-3. **Educación**: Incluye hasta 10 estudios con opción "En curso"
-4. **Proyectos**: Destaca hasta 10 proyectos relevantes con enlaces
-5. **Habilidades**: Lista tus competencias técnicas y blandas
-6. **Validación de datos**: Regex para email, teléfono, URLs y sanitización de texto
-7. **Generación con IA**: Crea CV Maestro, LinkedIn y CV Target
-8. **Análisis ATS**: Score y recomendaciones para optimizar tu CV
-9. **Exportación PDF**: Descarga todos los documentos generados
+- **Formulario dinámico**: Completa tus datos personales con validación en tiempo real
+- **Experiencia profesional**: Agrega hasta 10 empleos con fechas inteligentes
+- **Educación**: Incluye hasta 10 estudios con opción "En curso"
+- **Proyectos**: Destaca hasta 10 proyectos relevantes con enlaces
+- **Habilidades**: Lista tus competencias técnicas y blandas
+- **Validación de datos**: Regex para email, teléfono, URLs y sanitización de texto
+- **Selectores inteligentes**: Países y ciudades predefinidas para Latinoamérica y España
+
+### 🆕 Características Comunes (Ambas Opciones)
+- **Agregar formación**: Sube PDFs de cursos/certificaciones (opcional)
+- **Generación con IA**: CV Maestro integrando toda la información
+- **Perfil LinkedIn**: Contenido optimizado para redes profesionales
+- **CV Target**: Personalización para puestos específicos
+- **Análisis ATS**: Score 0-100 con recomendaciones accionables
+- **Exportación PDF**: Descarga con templates profesionales personalizables
 
 ### 🤖 Selección de Modelo de IA
 - **Selector en sidebar**: Elige entre OpenAI, Gemini o modo Auto

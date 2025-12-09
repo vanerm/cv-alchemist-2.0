@@ -469,7 +469,7 @@ def main():
             # ------------------------------------------------------------------
             if st.session_state.get("cv_master"):
 
-                st.markdown("### 4) Resultado: CV Maestro actualizado")
+                st.markdown("### ✅ CV Maestro actualizado")
 
                 st.text_area(
                     label="CV Maestro generado por IA",
@@ -499,9 +499,9 @@ def main():
                 )
 
                 # ==============================================================
-                # 🟦 Sección 5: Generar Perfil LinkedIn
+                # 🟦 Sección 4: Generar Perfil LinkedIn
                 # ==============================================================
-                st.markdown("### 5) Generar versión para LinkedIn")
+                st.markdown("### 4) Perfil LinkedIn")
 
                 if st.button("Generar Perfil LinkedIn"):
                     prompt_linkedin = build_prompt_linkedin_profile(
@@ -553,9 +553,9 @@ def main():
                     )
 
                 # ==============================================================
-                # 🟦 Sección 6: Generar CV Target
+                # 🟦 Sección 5: Generar CV Target
                 # ==============================================================
-                st.markdown("### 6) Generar CV orientado a un puesto (CV Target)")
+                st.markdown("### 5) CV Target")
 
                 st.session_state["job_description_raw"] = st.text_area(
                     label="Descripción del puesto objetivo",
@@ -621,10 +621,10 @@ def main():
                     )
                     
                     # ==============================================================
-                    # 🟦 Análisis ATS del CV Target
+                    # 🟦 Sección 6: Análisis ATS del CV Target
                     # ==============================================================
                     st.markdown("---")
-                    st.markdown("### 🔍 Análisis de Compatibilidad ATS")
+                    st.markdown("### 6) Análisis ATS")
                     st.caption("Evalúa qué tan bien tu CV pasará los sistemas de filtrado automático")
                     
                     if st.button("🔍 Analizar Compatibilidad ATS", key="analyze_ats_target"):
@@ -969,7 +969,7 @@ def main():
             height=100,
         )
 
-        submitted = st.button("Generar CV Maestro desde formulario")
+        submitted = st.button("Validar y continuar")
 
         # Procesar envío del formulario
         if submitted:
@@ -1101,133 +1101,142 @@ def main():
 
                 cv_base_text = build_cv_text_from_form(form_data)
 
-                # Reutilizamos el mismo pipeline que para PDF:
+                # Guardar datos del formulario en session_state
                 st.session_state["pdf_text_raw"] = cv_base_text
                 st.session_state["pdf_text_clean"] = cv_base_text
-                st.session_state["studies_text_clean"] = ""  # sin plan de estudios extra
+                st.session_state["studies_text_clean"] = None  # Inicializar como None
+                st.session_state["cv_master"] = None
                 st.session_state["linkedin_profile"] = None
                 st.session_state["cv_target"] = None
-
-                prompt = build_prompt_master(
-                    cv_text=cv_base_text,
-                    new_studies="",  # nada adicional
-                )
-
-                provider = st.session_state.get("ai_provider", "auto")
-                model = st.session_state.get("ai_model")
-                
-                # Determinar nombre del modelo para mostrar
-                if provider == "auto":
-                    model_name = "IA (OpenAI → Gemini)"
-                elif model:
-                    model_name = model
-                else:
-                    model_name = "IA"
-                
-                with st.spinner(f"Generando CV Maestro con {model_name}..."):
-                    cv_master = generate_cv_output(prompt, model=model, provider=provider)
-
-                st.session_state["cv_master"] = cv_master
+                st.session_state["show_success_form"] = True
                 st.rerun()
-
-        # Si ya hay CV Maestro generado desde el formulario, mostramos y permitimos LinkedIn / Target
-        if st.session_state.get("cv_master"):
-            st.markdown("### 2) Resultado: CV Maestro generado")
-
-            st.text_area(
-                label="CV Maestro generado por IA",
-                value=st.session_state["cv_master"],
-                height=400,
-                key="cv_master_output_from_form",
+        
+        # Mostrar mensaje de éxito después del rerun
+        if st.session_state.get("show_success_form"):
+            st.success("✅ Formulario validado correctamente.")
+            st.session_state["show_success_form"] = False
+        
+        # ----------------------------------------------------------------------
+        # Paso 2: Subir formación (igual que en opción 1)
+        # ----------------------------------------------------------------------
+        if st.session_state.get("pdf_text_clean"):
+            
+            st.markdown("### 2) Subir nueva formación / plan de estudios (PDFs)")
+            
+            study_files_form = st.file_uploader(
+                label="Subir uno o varios PDFs de formación, cursos o planes de estudio",
+                type=["pdf"],
+                accept_multiple_files=True,
+                help="Puedes subir PDFs de formación O bien omitir este paso.",
+                key=f"study_files_uploader_form_{st.session_state.get('reset_count', 0)}",
             )
             
-            # Selector de template
-            selected_template_form = st.selectbox(
-                "🎨 Template para el PDF",
-                template_names,
-                key="template_form",
-                help="Elige el estilo visual"
-            )
-            tmpl_form = get_template_by_display_name(selected_template_form)
-            st.caption(f"📝 {tmpl_form.description}")
+            # Procesar formación cargada
+            if study_files_form and st.button("Procesar PDFs de formación", key="process_studies_form"):
+                num_files = len(study_files_form) if isinstance(study_files_form, list) else 1
+                with st.spinner(f"Procesando {num_files} PDF(s) de formación... Esto puede tomar unos momentos."):
+                    studies_text_clean = process_uploaded_pdfs(study_files_form)
+                
+                if studies_text_clean:
+                    st.session_state["studies_text_clean"] = studies_text_clean
+                    st.session_state["cv_master"] = None
+                    st.session_state["linkedin_profile"] = None
+                    st.session_state["cv_target"] = None
+                    st.session_state["show_success_studies_form"] = True
+                    st.rerun()
             
-            # Botón de descarga PDF
-            pdf_bytes_form = generate_pdf(st.session_state["cv_master"], "CV Maestro", template=tmpl_form.name)
-            st.download_button(
-                label="📥 Descargar CV Maestro (PDF)",
-                data=pdf_bytes_form,
-                file_name="cv_maestro.pdf",
-                mime="application/pdf",
-            )
-
-            # Perfil LinkedIn
-            st.markdown("### 3) Generar versión para LinkedIn")
-
-            if st.button("Generar Perfil LinkedIn (desde formulario)"):
-                prompt_linkedin = build_prompt_linkedin_profile(
-                    master_cv=st.session_state["cv_master"]
-                )
-
-                provider = st.session_state.get("ai_provider", "auto")
-                model = st.session_state.get("ai_model")
-                
-                # Determinar nombre del modelo para mostrar
-                if provider == "auto":
-                    model_name = "IA (OpenAI → Gemini)"
-                elif model:
-                    model_name = model
-                else:
-                    model_name = "IA"
-                
-                with st.spinner(f"Generando perfil LinkedIn con {model_name}..."):
-                    linkedin_profile = generate_cv_output(prompt_linkedin, model=model, provider=provider)
-
-                st.session_state["linkedin_profile"] = linkedin_profile
+            # Mostrar mensaje de éxito después del rerun
+            if st.session_state.get("show_success_studies_form"):
+                st.success("Los PDFs de formación se procesaron correctamente.")
+                st.session_state["show_success_studies_form"] = False
+            
+            # Omitir formación y continuar
+            has_studies = st.session_state.get("studies_text_clean") not in [None, ""]
+            
+            if st.button(
+                "➡️ Omitir formación y generar CV Maestro",
+                disabled=has_studies,
+                help="Ya se procesaron PDFs de formación" if has_studies else "Continuar sin agregar formación adicional",
+                key="skip_studies_form"
+            ):
+                st.session_state["studies_text_clean"] = ""
+                st.session_state["cv_master"] = None
+                st.session_state["linkedin_profile"] = None
+                st.session_state["cv_target"] = None
+                st.session_state["show_info_skip_form"] = True
                 st.rerun()
+            
+            # Mostrar mensaje después del rerun
+            if st.session_state.get("show_info_skip_form"):
+                st.info("Formación omitida. Ahora puedes generar el CV Maestro.")
+                st.session_state["show_info_skip_form"] = False
+            
+            # ----------------------------------------------------------------------
+            # Paso 3: Generar CV Maestro (solo si formación fue procesada o omitida)
+            # ----------------------------------------------------------------------
+            if st.session_state.get("studies_text_clean") is not None:
+                
+                st.markdown("### 3) Generar CV Maestro con IA")
+                
+                if st.button("Generar CV Maestro", key="generate_master_form"):
+                    prompt = build_prompt_master(
+                        cv_text=st.session_state["pdf_text_clean"],
+                        new_studies=st.session_state["studies_text_clean"] or "",
+                    )
+                    
+                    provider = st.session_state.get("ai_provider", "auto")
+                    model = st.session_state.get("ai_model")
+                    
+                    # Determinar nombre del modelo para mostrar
+                    if provider == "auto":
+                        model_name = "IA (OpenAI → Gemini)"
+                    elif model:
+                        model_name = model
+                    else:
+                        model_name = "IA"
+                    
+                    with st.spinner(f"Generando CV Maestro con {model_name}..."):
+                        cv_master = generate_cv_output(prompt, model=model, provider=provider)
+                    
+                    st.session_state["cv_master"] = cv_master
+                    st.rerun()
 
-            if st.session_state.get("linkedin_profile"):
+            # Si ya hay CV Maestro generado desde el formulario, mostramos y permitimos LinkedIn / Target
+            if st.session_state.get("cv_master"):
+                st.markdown("### ✅ CV Maestro generado")
+
                 st.text_area(
-                    label="Perfil LinkedIn generado por IA",
-                    value=st.session_state["linkedin_profile"],
-                    height=350,
-                    key="linkedin_output_from_form",
+                    label="CV Maestro generado por IA",
+                    value=st.session_state["cv_master"],
+                    height=400,
+                    key="cv_master_output_from_form",
                 )
                 
                 # Selector de template
-                selected_template_li_form = st.selectbox(
-                    "🎨 Template para LinkedIn",
+                selected_template_form = st.selectbox(
+                    "🎨 Template para el PDF",
                     template_names,
-                    key="template_linkedin_form",
+                    key="template_form",
                     help="Elige el estilo visual"
                 )
-                tmpl_li_form = get_template_by_display_name(selected_template_li_form)
-                st.caption(f"📝 {tmpl_li_form.description}")
+                tmpl_form = get_template_by_display_name(selected_template_form)
+                st.caption(f"📝 {tmpl_form.description}")
                 
                 # Botón de descarga PDF
-                pdf_bytes_linkedin_form = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn", template=tmpl_li_form.name)
+                pdf_bytes_form = generate_pdf(st.session_state["cv_master"], "CV Maestro", template=tmpl_form.name)
                 st.download_button(
-                    label="📥 Descargar Perfil LinkedIn (PDF)",
-                    data=pdf_bytes_linkedin_form,
-                    file_name="perfil_linkedin.pdf",
+                    label="📥 Descargar CV Maestro (PDF)",
+                    data=pdf_bytes_form,
+                    file_name="cv_maestro.pdf",
                     mime="application/pdf",
                 )
 
-            # CV Target
-            st.markdown("### 4) Generar CV orientado a un puesto (CV Target)")
+                # Perfil LinkedIn
+                st.markdown("### 4) Perfil LinkedIn")
 
-            st.session_state["job_description_raw"] = st.text_area(
-                label="Descripción del puesto objetivo",
-                value=st.session_state.get("job_description_raw") or "",
-                height=220,
-            )
-
-            if st.button("Generar CV Target (desde formulario)"):
-                if not st.session_state["job_description_raw"].strip():
-                    st.warning("Debe pegar la descripción del puesto.")
-                else:
-                    prompt_target = build_prompt_targeted(
-                        master_cv=st.session_state["cv_master"],
-                        job_description=st.session_state["job_description_raw"],
+                if st.button("Generar Perfil LinkedIn (desde formulario)"):
+                    prompt_linkedin = build_prompt_linkedin_profile(
+                        master_cv=st.session_state["cv_master"]
                     )
 
                     provider = st.session_state.get("ai_provider", "auto")
@@ -1241,134 +1250,197 @@ def main():
                     else:
                         model_name = "IA"
                     
-                    with st.spinner(f"Generando CV Target con {model_name}..."):
-                        cv_target = generate_cv_output(prompt_target, model=model, provider=provider)
+                    with st.spinner(f"Generando perfil LinkedIn con {model_name}..."):
+                        linkedin_profile = generate_cv_output(prompt_linkedin, model=model, provider=provider)
 
-                    st.session_state["cv_target"] = cv_target
+                    st.session_state["linkedin_profile"] = linkedin_profile
                     st.rerun()
 
-            if st.session_state.get("cv_target"):
-                st.text_area(
-                    label="CV Target generado por IA",
-                    value=st.session_state["cv_target"],
-                    height=400,
-                    key="cv_target_output_from_form",
+                if st.session_state.get("linkedin_profile"):
+                    st.text_area(
+                        label="Perfil LinkedIn generado por IA",
+                        value=st.session_state["linkedin_profile"],
+                        height=350,
+                        key="linkedin_output_from_form",
+                    )
+                    
+                    # Selector de template
+                    selected_template_li_form = st.selectbox(
+                        "🎨 Template para LinkedIn",
+                        template_names,
+                        key="template_linkedin_form",
+                        help="Elige el estilo visual"
+                    )
+                    tmpl_li_form = get_template_by_display_name(selected_template_li_form)
+                    st.caption(f"📝 {tmpl_li_form.description}")
+                    
+                    # Botón de descarga PDF
+                    pdf_bytes_linkedin_form = generate_pdf(st.session_state["linkedin_profile"], "Perfil LinkedIn", template=tmpl_li_form.name)
+                    st.download_button(
+                        label="📥 Descargar Perfil LinkedIn (PDF)",
+                        data=pdf_bytes_linkedin_form,
+                        file_name="perfil_linkedin.pdf",
+                        mime="application/pdf",
+                    )
+
+                # CV Target
+                st.markdown("### 5) CV Target")
+
+                st.session_state["job_description_raw"] = st.text_area(
+                    label="Descripción del puesto objetivo",
+                    value=st.session_state.get("job_description_raw") or "",
+                    height=220,
+                    key="job_desc_form"
                 )
-                
-                # Selector de template
-                selected_template_tg_form = st.selectbox(
-                    "🎨 Template para CV Target",
-                    template_names,
-                    key="template_target_form",
-                    help="Elige el estilo visual"
-                )
-                tmpl_tg_form = get_template_by_display_name(selected_template_tg_form)
-                st.caption(f"📝 {tmpl_tg_form.description}")
-                
-                # Botón de descarga PDF
-                pdf_bytes_target_form = generate_pdf(st.session_state["cv_target"], "CV Target", template=tmpl_tg_form.name)
-                st.download_button(
-                    label="📥 Descargar CV Target (PDF)",
-                    data=pdf_bytes_target_form,
-                    file_name="cv_target.pdf",
-                    mime="application/pdf",
-                )
-                
-                # ==============================================================
-                # 🟦 Análisis ATS del CV Target (desde formulario)
-                # ==============================================================
-                st.markdown("---")
-                st.markdown("### 🔍 Análisis de Compatibilidad ATS")
-                st.caption("Evalúa qué tan bien tu CV pasará los sistemas de filtrado automático")
-                
-                if st.button("🔍 Analizar Compatibilidad ATS", key="analyze_ats_form"):
-                    with st.spinner("Analizando compatibilidad ATS del CV Target..."):
-                        ats_result = analyze_ats_compatibility(
-                            cv_content=st.session_state["cv_target"],
-                            job_description=st.session_state.get("job_description_raw", "")
-                        )
-                        st.session_state["ats_analysis_form"] = ats_result
-                        st.rerun()
-                
-                # Mostrar resultados del análisis ATS
-                if st.session_state.get("ats_analysis_form"):
-                    ats = st.session_state["ats_analysis_form"]
-                    score = ats.get("score", 0)
-                    
-                    # Score principal con color
-                    col_score, col_level = st.columns([1, 2])
-                    with col_score:
-                        st.metric(
-                            "Score ATS",
-                            f"{score}/100",
-                            delta=None
-                        )
-                    with col_level:
-                        emoji = get_score_emoji(score)
-                        st.markdown(f"### {emoji} {ats.get('level', 'N/A')}")
-                    
-                    # Barra de progreso
-                    st.progress(score / 100)
-                    
-                    # Fortalezas y Debilidades
-                    col_str, col_weak = st.columns(2)
-                    
-                    with col_str:
-                        st.markdown("**✅ Fortalezas**")
-                        strengths = ats.get("strengths", [])
-                        if strengths:
-                            for strength in strengths:
-                                st.success(f"• {strength}")
-                        else:
-                            st.info("No se identificaron fortalezas específicas")
-                    
-                    with col_weak:
-                        st.markdown("**⚠️ Debilidades**")
-                        weaknesses = ats.get("weaknesses", [])
-                        if weaknesses:
-                            for weakness in weaknesses:
-                                st.warning(f"• {weakness}")
-                        else:
-                            st.info("No se identificaron debilidades críticas")
-                    
-                    # Palabras clave
-                    st.markdown("**🔑 Análisis de Palabras Clave**")
-                    col_found, col_missing = st.columns(2)
-                    
-                    with col_found:
-                        st.markdown("*Encontradas:*")
-                        kw_found = ats.get("keywords_found", [])
-                        if kw_found:
-                            st.write(", ".join(kw_found[:10]))  # Mostrar primeras 10
-                        else:
-                            st.caption("No especificadas")
-                    
-                    with col_missing:
-                        st.markdown("*Faltantes:*")
-                        kw_missing = ats.get("keywords_missing", [])
-                        if kw_missing:
-                            for kw in kw_missing[:5]:  # Mostrar primeras 5
-                                st.error(f"• {kw}")
-                        else:
-                            st.success("✓ Todas las palabras clave presentes")
-                    
-                    # Recomendaciones
-                    st.markdown("**💡 Recomendaciones de Mejora**")
-                    recommendations = ats.get("recommendations", [])
-                    if recommendations:
-                        for i, rec in enumerate(recommendations, 1):
-                            st.info(f"{i}. {rec}")
+
+                if st.button("Generar CV Target (desde formulario)"):
+                    if not st.session_state["job_description_raw"].strip():
+                        st.warning("Debe pegar la descripción del puesto.")
                     else:
-                        st.success("✓ No se requieren mejoras adicionales")
-                    
-                    # Detalles por criterio (expandible)
-                    with st.expander("📊 Ver detalles por criterio"):
-                        details = ats.get("details", {})
-                        if details:
-                            for criterion, detail in details.items():
-                                st.markdown(f"**{criterion}:** {detail}")
+                        prompt_target = build_prompt_targeted(
+                            master_cv=st.session_state["cv_master"],
+                            job_description=st.session_state["job_description_raw"],
+                        )
+
+                        provider = st.session_state.get("ai_provider", "auto")
+                        model = st.session_state.get("ai_model")
+                        
+                        # Determinar nombre del modelo para mostrar
+                        if provider == "auto":
+                            model_name = "IA (OpenAI → Gemini)"
+                        elif model:
+                            model_name = model
                         else:
-                            st.caption("No hay detalles adicionales disponibles")
+                            model_name = "IA"
+                        
+                        with st.spinner(f"Generando CV Target con {model_name}..."):
+                            cv_target = generate_cv_output(prompt_target, model=model, provider=provider)
+
+                        st.session_state["cv_target"] = cv_target
+                        st.rerun()
+
+                if st.session_state.get("cv_target"):
+                    st.text_area(
+                        label="CV Target generado por IA",
+                        value=st.session_state["cv_target"],
+                        height=400,
+                        key="cv_target_output_from_form",
+                    )
+                    
+                    # Selector de template
+                    selected_template_tg_form = st.selectbox(
+                        "🎨 Template para CV Target",
+                        template_names,
+                        key="template_target_form",
+                        help="Elige el estilo visual"
+                    )
+                    tmpl_tg_form = get_template_by_display_name(selected_template_tg_form)
+                    st.caption(f"📝 {tmpl_tg_form.description}")
+                    
+                    # Botón de descarga PDF
+                    pdf_bytes_target_form = generate_pdf(st.session_state["cv_target"], "CV Target", template=tmpl_tg_form.name)
+                    st.download_button(
+                        label="📥 Descargar CV Target (PDF)",
+                        data=pdf_bytes_target_form,
+                        file_name="cv_target.pdf",
+                        mime="application/pdf",
+                    )
+                    
+                    # ==============================================================
+                    # 🟦 Sección 6: Análisis ATS del CV Target (desde formulario)
+                    # ==============================================================
+                    st.markdown("---")
+                    st.markdown("### 6) Análisis ATS")
+                    st.caption("Evalúa qué tan bien tu CV pasará los sistemas de filtrado automático")
+                    
+                    if st.button("🔍 Analizar Compatibilidad ATS", key="analyze_ats_form"):
+                        with st.spinner("Analizando compatibilidad ATS del CV Target..."):
+                            ats_result = analyze_ats_compatibility(
+                                cv_content=st.session_state["cv_target"],
+                                job_description=st.session_state.get("job_description_raw", "")
+                            )
+                            st.session_state["ats_analysis_form"] = ats_result
+                            st.rerun()
+                    
+                    # Mostrar resultados del análisis ATS
+                    if st.session_state.get("ats_analysis_form"):
+                        ats = st.session_state["ats_analysis_form"]
+                        score = ats.get("score", 0)
+                        
+                        # Score principal con color
+                        col_score, col_level = st.columns([1, 2])
+                        with col_score:
+                            st.metric(
+                                "Score ATS",
+                                f"{score}/100",
+                                delta=None
+                            )
+                        with col_level:
+                            emoji = get_score_emoji(score)
+                            st.markdown(f"### {emoji} {ats.get('level', 'N/A')}")
+                        
+                        # Barra de progreso
+                        st.progress(score / 100)
+                        
+                        # Fortalezas y Debilidades
+                        col_str, col_weak = st.columns(2)
+                        
+                        with col_str:
+                            st.markdown("**✅ Fortalezas**")
+                            strengths = ats.get("strengths", [])
+                            if strengths:
+                                for strength in strengths:
+                                    st.success(f"• {strength}")
+                            else:
+                                st.info("No se identificaron fortalezas específicas")
+                        
+                        with col_weak:
+                            st.markdown("**⚠️ Debilidades**")
+                            weaknesses = ats.get("weaknesses", [])
+                            if weaknesses:
+                                for weakness in weaknesses:
+                                    st.warning(f"• {weakness}")
+                            else:
+                                st.info("No se identificaron debilidades críticas")
+                        
+                        # Palabras clave
+                        st.markdown("**🔑 Análisis de Palabras Clave**")
+                        col_found, col_missing = st.columns(2)
+                        
+                        with col_found:
+                            st.markdown("*Encontradas:*")
+                            kw_found = ats.get("keywords_found", [])
+                            if kw_found:
+                                st.write(", ".join(kw_found[:10]))  # Mostrar primeras 10
+                            else:
+                                st.caption("No especificadas")
+                        
+                        with col_missing:
+                            st.markdown("*Faltantes:*")
+                            kw_missing = ats.get("keywords_missing", [])
+                            if kw_missing:
+                                for kw in kw_missing[:5]:  # Mostrar primeras 5
+                                    st.error(f"• {kw}")
+                            else:
+                                st.success("✓ Todas las palabras clave presentes")
+                        
+                        # Recomendaciones
+                        st.markdown("**💡 Recomendaciones de Mejora**")
+                        recommendations = ats.get("recommendations", [])
+                        if recommendations:
+                            for i, rec in enumerate(recommendations, 1):
+                                st.info(f"{i}. {rec}")
+                        else:
+                            st.success("✓ No se requieren mejoras adicionales")
+                        
+                        # Detalles por criterio (expandible)
+                        with st.expander("📊 Ver detalles por criterio"):
+                            details = ats.get("details", {})
+                            if details:
+                                for criterion, detail in details.items():
+                                    st.markdown(f"**{criterion}:** {detail}")
+                            else:
+                                st.caption("No hay detalles adicionales disponibles")
 
 
 if __name__ == "__main__":
