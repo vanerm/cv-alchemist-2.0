@@ -202,7 +202,7 @@ def create_sidebar():
         st.markdown("""
             <div style="text-align: center; color: #2C3E50; font-size: 0.8rem; padding: 1rem 0;">
                 <p style="margin: 0;">Desarrollado por<br><strong style="color: #667eea;">Vanesa Mizrahi</strong></p>
-                <p style="margin-top: 0.5rem; color: #6c757d;">CoderHouse 2025</p>
+                <p style="margin-top: 0.5rem; color: #6c757d;">2025</p>
             </div>
         """, unsafe_allow_html=True)
 
