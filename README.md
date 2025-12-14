@@ -11,19 +11,49 @@ Aplicación web con IA desarrollada con **Streamlit** para crear, analizar y opt
 
 ## 📌 Descripción del Proyecto
 
-CV Alchemist 2.0 es una aplicación interactiva que permite:
+### 🎯 Problemática
+En el contexto actual, los profesionales necesitan actualizar y adaptar sus CVs constantemente para mantenerse competitivos. Sin embargo, los CVs exportados desde LinkedIn suelen ser genéricos, difíciles de personalizar y poco optimizados para sistemas ATS.
 
-- **Subir un CV existente** en formato PDF para analizarlo y extraer su contenido.  
-- **Crear un CV desde cero** mediante un formulario dinámico con validación de datos.  
-- **Generar un CV Maestro** actualizado integrando nueva formación con IA.  
-- **Crear un Perfil de LinkedIn** optimizado a partir del CV Maestro.  
-- **Generar un CV Target** personalizado para un puesto específico.  
-- **Seleccionar modelo de IA** (OpenAI o Gemini) con fallback automático.
-- **Analizar compatibilidad ATS** del CV generado con scoring y recomendaciones.
-- **Elegir templates profesionales** para personalizar el diseño del PDF.
-- **Descargar en PDF** todos los documentos generados (CV Maestro, LinkedIn, CV Target).
+Además, muchos usuarios no cuentan con un CV previo en PDF y requieren una alternativa guiada para generarlo desde cero.
 
-El proyecto forma parte del módulo **Prompt Engineering** de CoderHouse y tiene como objetivo aplicar buenas prácticas de diseño de prompts en una aplicación funcional en Python.
+Esta situación genera una necesidad clara: **automatizar la creación y optimización de CVs mediante IA**, reduciendo tiempo, errores y esfuerzo manual.
+
+### 💡 Solución Propuesta
+Se desarrolló una aplicación web completa en Streamlit llamada **CV Alchemist 2.0**, que ofrece un flujo integral de 6 pasos:
+
+**🔄 Flujo de Entrada Dual:**
+- **Subir un CV en PDF** (con validación avanzada y extracción inteligente), o
+- **Completar un formulario guiado** para generar un CV base desde cero con validación en tiempo real
+
+**📚 Enriquecimiento Opcional:**
+- **Carga de formación adicional** mediante PDFs de cursos, certificaciones y planes de estudio
+- **Integración automática** de nueva formación con experiencia existente
+
+**🤖 Generación Inteligente con IA:**
+A través de prompts diseñados con técnicas avanzadas de ingeniería y reglas anti-alucinaciones, la IA procesa la información y genera:
+
+1. **CV Maestro actualizado** - Integra toda la información de forma coherente
+2. **Perfil LinkedIn optimizado** - Contenido específico para redes profesionales
+3. **CV Target personalizado** - Adaptado para ofertas laborales específicas
+
+**🔍 Análisis y Optimización:**
+- **Análisis ATS completo** con scoring 0-100 y recomendaciones accionables
+- **Templates profesionales** personalizables según industria
+- **Exportación en PDF** con diseño profesional
+
+**🛡️ Características Avanzadas:**
+- **Selección de modelos de IA** (OpenAI/Gemini) con fallback automático
+- **Validación robusta** de datos y archivos
+- **Interfaz responsive** con progreso en tiempo real
+
+De esta forma, el flujo se vuelve accesible, completo y profesional para cualquier tipo de usuario.
+
+---
+
+**🎯 Resultado Final:**
+Una plataforma completa de optimización de CVs que combina la flexibilidad de entrada (PDF o formulario), el poder de la IA generativa con múltiples modelos, y herramientas profesionales de análisis y exportación.
+
+El proyecto forma parte del módulo **Prompt Engineering** de CoderHouse y demuestra la aplicación práctica de técnicas avanzadas de diseño de prompts, arquitectura modular y desarrollo de aplicaciones web con IA en Python.
 
 ---
 
@@ -46,6 +76,25 @@ Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
 - **python-dotenv** (gestión de variables de entorno)
 - **Entorno virtual venv**
 - **Git & GitHub**
+
+---
+
+## 💰 Justificación de la Viabilidad Técnica y Económica
+
+- La aplicación se desarrollará en **Streamlit**, que facilita interfaces web sin necesidad de frameworks complejos
+- La integración con modelos de IA se realizará mediante llamadas a API (Gemini u OpenAI)
+- El costo es controlable: el flujo requiere **solo dos llamadas principales**, lo cual es económico
+- Las librerías necesarias (PyPDF2, Streamlit, etc.) son gratuitas
+- El proyecto escala de forma natural desde el [MVP anterior de CoderHouse](https://github.com/vanerm/cv-alchemist) (realizado en el curso previo de Prompt Engineering I), hacia una aplicación web configurable
+
+### 🚀 Evolución respecto al MVP previo
+
+- Migración del flujo del MVP en Colab a una aplicación web interactiva
+- Modularización completa (servicios, prompts, extracción, utils)
+- Implementación de carga y validación de PDF
+- Incorporación de un formulario guiado para crear el CV si el usuario no tiene un PDF
+- Base para integración con modelos de IA (OpenAI / Gemini)
+- Preparación para deploy público en Streamlit Community Cloud
 
 ---
 
@@ -195,52 +244,146 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 - **Análisis ATS**: Score 0-100 con recomendaciones accionables
 - **Exportación PDF**: Descarga con templates profesionales personalizables
 
-### 🤖 Selección de Modelo de IA
-- **Selector en sidebar**: Elige entre OpenAI, Gemini o modo Auto
-- **Múltiples modelos OpenAI**: gpt-4o-mini, gpt-4o, gpt-4-turbo-preview, gpt-3.5-turbo
-- **Múltiples modelos Gemini**: gemini-flash-latest, gemini-2.5-flash, gemini-2.5-pro, gemini-pro-latest
-- **Fallback automático**: Si OpenAI falla, usa Gemini automáticamente
-- **Mensajes dinámicos**: El spinner muestra el modelo específico en uso
-- **Logs de debugging**: Seguimiento detallado en consola
+### 📚 Sistema de Carga de Formación Adicional
+- **Carga múltiple de PDFs**: Sube planes de estudio, certificaciones y cursos
+- **Extracción inteligente**: Procesamiento automático del contenido de formación
+- **Integración con CV base**: La IA combina la nueva formación con tu experiencia existente
+- **Validación de contenido**: Verificación de que los PDFs contienen información relevante
+- **Procesamiento contextual**: Mantiene coherencia entre formación previa y nueva
+
+### 🤖 Sistema de Selección de Modelo de IA
+- **Selector inteligente en sidebar**: 
+  - Opción OpenAI con múltiples modelos disponibles
+  - Opción Gemini con modelos de última generación
+  - Modo Auto con fallback inteligente
+- **Modelos OpenAI disponibles**: 
+  - gpt-4o-mini (rápido y económico)
+  - gpt-4o (balance rendimiento/costo)
+  - gpt-4-turbo-preview (máxima capacidad)
+  - gpt-3.5-turbo (alternativa rápida)
+- **Modelos Gemini disponibles**: 
+  - gemini-flash-latest (velocidad optimizada)
+  - gemini-2.5-flash (nueva generación rápida)
+  - gemini-2.5-pro (máxima calidad)
+  - gemini-pro-latest (versión más reciente)
+- **Sistema de fallback robusto**: 
+  - Si OpenAI falla por límites o errores, cambia automáticamente a Gemini
+  - Manejo inteligente de errores de API
+  - Continuidad del flujo sin intervención del usuario
+- **Feedback dinámico en tiempo real**: 
+  - Spinners que muestran el modelo específico en uso
+  - Mensajes de estado durante el procesamiento
+  - Notificaciones de cambio de modelo por fallback
+- **Sistema de logging avanzado**: 
+  - Seguimiento detallado en consola para debugging
+  - Monitoreo de rendimiento por modelo
+  - Registro de errores y fallbacks para optimización
 
 ### 🎨 Templates Profesionales
-- **Clásico**: Formato tradicional (ATS ⭐⭐⭐⭐⭐) - Ideal para Legal, Finanzas
-- **Moderno**: Balance diseño/parseabilidad (ATS ⭐⭐⭐⭐) - Ideal para Tech, Startups
-- **Minimalista**: Espaciado generoso (ATS ⭐⭐⭐⭐) - Ideal para Diseño, UX/UI
-- **Creativo**: Más visual (ATS ⭐⭐⭐) - Ideal para Marketing, Publicidad
-- **Personalización**: Tipografía, colores, iconos y layout profesional
+- **Clásico**: Formato tradicional con máxima compatibilidad ATS (⭐⭐⭐⭐⭐)
+  - Ideal para: Legal, Finanzas, Consultoría, Gobierno
+  - Características: Tipografía conservadora, estructura lineal, sin elementos gráficos
+- **Moderno**: Balance perfecto entre diseño y parseabilidad (ATS ⭐⭐⭐⭐)
+  - Ideal para: Tech, Startups, Ingeniería, Data Science
+  - Características: Tipografía moderna, colores sutiles, iconos minimalistas
+- **Minimalista**: Espaciado generoso y limpieza visual (ATS ⭐⭐⭐⭐)
+  - Ideal para: Diseño, UX/UI, Arquitectura, Creatividad
+  - Características: Mucho espacio en blanco, tipografía elegante, estructura clara
+- **Creativo**: Más visual y diferenciado (ATS ⭐⭐⭐)
+  - Ideal para: Marketing, Publicidad, Arte, Medios
+  - Características: Colores vibrantes, elementos gráficos, layout innovador
+- **Personalización completa**: 
+  - Tipografía: Selección de fuentes profesionales
+  - Colores: Paleta personalizable por template
+  - Iconos: Biblioteca de iconos profesionales
+  - Layout: Estructura adaptable según contenido
 
 ### 🔍 Análisis ATS Avanzado
-- **Scoring 0-100**: Evaluación cuantitativa de compatibilidad
-- **4 Criterios**: Formato (25%), Palabras clave (40%), Contenido (20%), Optimización (15%)
-- **Palabras clave**: Identificación de términos encontrados y faltantes
-- **Fortalezas y debilidades**: Análisis detallado por categoría
-- **Recomendaciones accionables**: Sugerencias específicas para mejorar
-- **Detalles por criterio**: Información expandible para cada métrica
+- **Scoring 0-100**: Evaluación cuantitativa de compatibilidad con sistemas ATS
+- **4 Criterios ponderados**: 
+  - Formato y estructura (25%): Parseabilidad y organización
+  - Palabras clave (40%): Coincidencia con términos del puesto
+  - Contenido y claridad (20%): Legibilidad y coherencia
+  - Optimización ATS (15%): Elementos técnicos de compatibilidad
+- **Análisis de palabras clave**: Identificación de términos encontrados vs faltantes
+- **Fortalezas y debilidades**: Evaluación detallada por cada criterio
+- **Recomendaciones accionables**: Sugerencias específicas y priorizadas para mejorar
+- **Detalles expandibles**: Información completa por cada métrica evaluada
+- **Comparación con estándares**: Benchmarking contra mejores prácticas ATS
 
-### 🤖 Prompts Inteligentes
-- **Prompt Maestro**: Integra nueva formación sin inventar experiencia
-- **Prompt Target**: Personaliza CV sin alucinaciones, respetando la verdad
-- **Prompt LinkedIn**: Genera perfil profesional optimizado
-- **Prompt ATS**: Analiza compatibilidad con sistemas de reclutamiento
-- **Anti-alucinaciones**: Reglas estrictas para mantener veracidad
+### 🤖 Sistema de Prompts Inteligentes
+- **Prompt Maestro avanzado**: 
+  - Integra nueva formación respetando experiencia existente
+  - Evita inventar experiencias o habilidades no mencionadas
+  - Mantiene coherencia temporal y profesional
+  - Optimiza estructura y redacción sin alterar hechos
+- **Prompt Target especializado**: 
+  - Personaliza CV para puestos específicos sin alucinaciones
+  - Resalta experiencia relevante sin inventar nueva
+  - Adapta lenguaje y énfasis según la descripción del puesto
+  - Mantiene veracidad absoluta de la información original
+- **Prompt LinkedIn profesional**: 
+  - Genera contenido optimizado para redes profesionales
+  - Adapta tono y formato para plataforma LinkedIn
+  - Crea resumen ejecutivo atractivo y profesional
+  - Optimiza para búsquedas y networking
+- **Prompt ATS especializado**: 
+  - Analiza compatibilidad con sistemas de reclutamiento
+  - Evalúa criterios técnicos y de contenido
+  - Genera recomendaciones accionables y priorizadas
+  - Proporciona scoring detallado y justificado
+- **Sistema anti-alucinaciones robusto**: 
+  - Reglas estrictas para mantener veracidad de la información
+  - Validación cruzada de datos generados
+  - Prohibición explícita de inventar experiencias
+  - Monitoreo de consistencia en todas las generaciones
 
-### 🛡️ Seguridad y Validación
-- **Validación de email**: Regex para formato válido con @ y dominio
-- **Validación de teléfono**: Solo números, +, -, ( ) con longitud mínima/máxima
-- **Validación de URLs**: Formato http/https con dominio válido
-- **Validación de nombres**: Solo letras, espacios, acentos, apóstrofes y guiones
-- **Sanitización de texto**: Remoción de caracteres de control y peligrosos
-- **Validación de PDFs**: Tamaño, tipo, protección y contenido legible
-- **Mensajes de error detallados**: Feedback específico para cada campo
+### 🛡️ Seguridad y Validación Robusta
+- **Validación de formularios en tiempo real**: 
+  - Email: Regex estricto para formato válido con @ y dominio
+  - Teléfono: Solo números, +, -, ( ) con longitud mínima/máxima
+  - URLs: Verificación de formato http/https con dominio válido
+  - Nombres: Solo letras, espacios, acentos, apóstrofes y guiones
+- **Sanitización avanzada de inputs**: 
+  - Remoción de caracteres de control y potencialmente peligrosos
+  - Prevención de inyección de código en campos de texto
+  - Normalización de caracteres especiales y acentos
+- **Validación exhaustiva de PDFs**: 
+  - Verificación de tamaño (límite de 200MB)
+  - Validación de tipo de archivo y extensión
+  - Detección de PDFs protegidos con contraseña
+  - Verificación de contenido legible y extracción exitosa
+- **Sistema de feedback detallado**: 
+  - Mensajes de error específicos para cada tipo de validación
+  - Sugerencias de corrección para errores comunes
+  - Indicadores visuales de campos válidos/inválidos
 
-### 🎨 Interfaz de Usuario
-- **Sidebar interactivo**: Progreso, estadísticas, selección de modelo
-- **Tema lila pastel**: Diseño consistente y profesional
-- **Indicadores de progreso**: Checkmarks verdes para pasos completados
-- **Botón reiniciar**: Limpia sesión sin recargar página
-- **Mensajes contextuales**: Success, info, warning y error con iconos
-- **Responsive**: Adaptable a diferentes tamaños de pantalla
+### 🎨 Interfaz de Usuario Avanzada
+- **Sidebar interactivo dinámico**: 
+  - Progreso en tiempo real con indicadores visuales
+  - Estadísticas de documentos generados y score ATS
+  - Selección de modelo de IA con fallback automático
+  - Enlaces rápidos a documentación y recursos
+- **Sistema de temas profesional**: 
+  - Tema lila pastel consistente en toda la aplicación
+  - Configuración de tema dark forzado para mejor experiencia
+  - Gradientes y sombras para profundidad visual
+- **Indicadores de progreso inteligentes**: 
+  - Checkmarks verdes para pasos completados
+  - Indicador especial para pasos opcionales omitidos
+  - Barra de progreso visual por etapas
+- **Gestión de sesión**: 
+  - Botón reiniciar que limpia sesión sin recargar página
+  - Persistencia de datos durante la sesión
+  - Manejo inteligente de estados de la aplicación
+- **Sistema de mensajes contextuales**: 
+  - Alertas de success, info, warning y error con iconos
+  - Spinners dinámicos que muestran el modelo de IA en uso
+  - Feedback inmediato para todas las acciones del usuario
+- **Diseño responsive**: 
+  - Adaptable a diferentes tamaños de pantalla
+  - Optimizado para desktop y mobile
+  - Componentes que se reorganizan según el espacio disponible
 
 ---
 
