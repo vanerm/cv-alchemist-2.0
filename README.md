@@ -85,16 +85,9 @@ Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
 - La integración con modelos de IA se **realiza mediante llamadas a API** (Gemini u OpenAI)
 - El costo es controlable: el flujo requiere **solo dos llamadas principales**, lo cual es económico
 - Las librerías necesarias (PyPDF2, Streamlit, etc.) son gratuitas
-- El proyecto **escaló de forma natural** desde una versión inicial hacia una aplicación web completa
+- El proyecto **escaló de forma natural** desde el [MVP anterior](https://github.com/vanerm/cv-alchemist) (realizado en el curso previo de Prompt Engineering I de CoderHouse), hacia una aplicación web configurable
 
-
-### 🧭 Evolución desde el MVP Anterior
-
-Este proyecto es una evolución de la primera versión desarrollada durante el curso **Prompt Engineering I** de CoderHouse.
-
-👉 **[Ver repositorio original (MVP 2025)](https://github.com/vanerm/cv-alchemist)**
-
-**Principales mejoras implementadas:**
+### 🚀 Evolución respecto al MVP previo
 
 - **Migración completada** del flujo del MVP en Colab a una aplicación web interactiva
 - **Modularización completa** (servicios, prompts, extracción, utils)
@@ -115,6 +108,7 @@ cv-alchemist-2.0/
 ├── requirements.txt              # Dependencias del proyecto
 ├── .gitignore                    # Archivos ignorados por Git
 ├── LICENSE                       # Licencia MIT
+├── CHANGELOG.md                  # Historial de cambios del proyecto
 │
 ├── src/                          # Lógica y módulos internos
 │   ├── extract_pdf.py            # Extracción de texto desde PDF
@@ -139,9 +133,11 @@ cv-alchemist-2.0/
 │   ├── memory_monitor.py         # Widget opcional de monitoreo
 │   └── README.md                 # Documentación de tests
 │
-├── docs/                         # Documentación del curso
-│   └── preentrega/
-│       └── diagramas/            # Imágenes y recursos
+├── docs/                         # Documentación técnica del proyecto
+│   ├── ATS_ANALYSIS.md           # Análisis de compatibilidad ATS
+│   ├── PDF_DESIGN_IMPROVEMENTS.md # Mejoras de diseño visual de PDFs
+│   ├── PDF_VALIDATION.md         # Sistema de validación de PDFs
+│   └── UI_IMPROVEMENTS_PHASE1.md # Mejoras de interfaz de usuario
 │
 └── venv/                         # Entorno virtual (excluido de Git)
 
