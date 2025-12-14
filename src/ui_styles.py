@@ -215,6 +215,26 @@ def apply_custom_styles():
             font-weight: 600;
         }
         
+        /* Métricas en sidebar - ajuste de tamaño para evitar truncamiento */
+        [data-testid="stSidebar"] [data-testid="stMetricValue"] {
+            font-size: 1.5rem !important;
+            line-height: 1.2 !important;
+            word-break: keep-all !important;
+            white-space: nowrap !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+        }
+        
+        [data-testid="stSidebar"] [data-testid="stMetric"] {
+            min-width: 0 !important;
+            flex-shrink: 1 !important;
+        }
+        
+        [data-testid="stSidebar"] [data-testid="stMetricLabel"] {
+            font-size: 0.8rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
         /* Icono de ayuda en métricas - mejor contraste */
         [data-testid="stMetric"] [data-testid="stTooltipIcon"],
         [data-testid="stMetric"] svg {
