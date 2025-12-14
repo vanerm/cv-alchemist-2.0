@@ -1,6 +1,12 @@
 # 🧪 CV Alchemist 2.0  
 Aplicación web con IA desarrollada con **Streamlit** para crear, analizar y optimizar CVs.
 
+## 🚀 Aplicación en Vivo
+
+👉 **[Probar CV Alchemist 2.0](https://cv-alchemist.streamlit.app/)**
+
+*La aplicación está desplegada en Streamlit Community Cloud y lista para usar.*
+
 ---
 
 ## 📌 Descripción del Proyecto
@@ -276,17 +282,16 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Tema visual consistente (lila pastel) en toda la UI
 - [x] Scripts de testing y debugging organizados en carpeta tests/
 - [x] Monitoreo de uso de RAM (183 MB máximo - óptimo para deploy)
+- [x] **Deploy en Streamlit Community Cloud** ✅
 
 ---
 
 ## 🧭 Roadmap / Próximos Pasos
 
-- [ ] Deploy de la app en Streamlit Community Cloud
 - [ ] Agregar soporte para más idiomas (inglés, portugués)
 - [ ] Implementar historial de CVs generados
 - [ ] Agregar exportación en formato Word (.docx)
 - [ ] Integrar más modelos de IA (Claude, Llama)
-- [ ] Crear sistema de plantillas personalizadas por usuario
 
 ---
 
