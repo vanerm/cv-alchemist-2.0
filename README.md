@@ -81,20 +81,27 @@ Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
 
 ## 💰 Justificación de la Viabilidad Técnica y Económica
 
-- La aplicación se desarrollará en **Streamlit**, que facilita interfaces web sin necesidad de frameworks complejos
-- La integración con modelos de IA se realizará mediante llamadas a API (Gemini u OpenAI)
+- La aplicación se **desarrolló en Streamlit**, que facilita interfaces web sin necesidad de frameworks complejos
+- La integración con modelos de IA se **realiza mediante llamadas a API** (Gemini u OpenAI)
 - El costo es controlable: el flujo requiere **solo dos llamadas principales**, lo cual es económico
 - Las librerías necesarias (PyPDF2, Streamlit, etc.) son gratuitas
-- El proyecto escala de forma natural desde el [MVP anterior de CoderHouse](https://github.com/vanerm/cv-alchemist) (realizado en el curso previo de Prompt Engineering I), hacia una aplicación web configurable
+- El proyecto **escaló de forma natural** desde una versión inicial hacia una aplicación web completa
 
-### 🚀 Evolución respecto al MVP previo
 
-- Migración del flujo del MVP en Colab a una aplicación web interactiva
-- Modularización completa (servicios, prompts, extracción, utils)
-- Implementación de carga y validación de PDF
-- Incorporación de un formulario guiado para crear el CV si el usuario no tiene un PDF
-- Base para integración con modelos de IA (OpenAI / Gemini)
-- Preparación para deploy público en Streamlit Community Cloud
+### 🧭 Evolución desde el MVP Anterior
+
+Este proyecto es una evolución de la primera versión desarrollada durante el curso **Prompt Engineering I** de CoderHouse.
+
+👉 **[Ver repositorio original (MVP 2025)](https://github.com/vanerm/cv-alchemist)**
+
+**Principales mejoras implementadas:**
+
+- **Migración completada** del flujo del MVP en Colab a una aplicación web interactiva
+- **Modularización completa** (servicios, prompts, extracción, utils)
+- **Implementación exitosa** de carga y validación de PDF
+- **Incorporación** de un formulario guiado para crear el CV si el usuario no tiene un PDF
+- **Integración completa** con modelos de IA (OpenAI / Gemini)
+- **Deploy exitoso** en Streamlit Community Cloud
 
 ---
 
@@ -398,7 +405,7 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 
 ---
 
-## 🚧 Estado Actual del Proyecto
+## ✅ Estado Actual del Proyecto
 
 - [x] Estructura base funcionando  
 - [x] Interfaz Streamlit operativa  
@@ -425,16 +432,22 @@ La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y u
 - [x] Tema visual consistente (lila pastel) en toda la UI
 - [x] Scripts de testing y debugging organizados en carpeta tests/
 - [x] Monitoreo de uso de RAM (183 MB máximo - óptimo para deploy)
-- [x] **Deploy en Streamlit Community Cloud** ✅
+- [x] Deploy en Streamlit Community Cloud
 
 ---
 
-## 🧭 Roadmap / Próximos Pasos
+## 🚀 Ideas para Futuras Versiones
 
-- [ ] Agregar soporte para más idiomas (inglés, portugués)
-- [ ] Implementar historial de CVs generados
-- [ ] Agregar exportación en formato Word (.docx)
-- [ ] Integrar más modelos de IA (Claude, Llama)
+*El proyecto actual está completo y funcional. Estas son posibles mejoras para versiones futuras:*
+
+- 🌍 **Soporte multidioma**: Interfaz y generación en inglés y portugués
+- 📁 **Historial de documentos**: Guardar y gestionar CVs generados anteriormente
+- 📄 **Exportación Word**: Descarga en formato .docx además de PDF
+- 🤖 **Más modelos de IA**: Integración con Claude, Llama y otros LLMs
+- 📈 **Análisis comparativo**: Comparar múltiples versiones de CV
+- 🔗 **Integración job boards**: Conexión directa con portales de empleo
+- 🎨 **Editor visual**: Personalización avanzada de templates en tiempo real
+- 📊 **Dashboard analytics**: Métricas de rendimiento y uso de la aplicación
 
 ---
 
