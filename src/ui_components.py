@@ -191,7 +191,7 @@ def create_sidebar():
         # Links útiles
         st.markdown("### 🔗 Enlaces")
         st.markdown("""
-            - [📖 Documentación](https://github.com/vanerm/cv-alchemist-2.0)
+            - [📖 Documentación](https://docs.google.com/presentation/d/1eEIGp8-rix1Tz2_vwm3lCRcLPKQTEXyUOgclLZ90vF0/edit?usp=sharing)
             - [⭐ GitHub](https://github.com/vanerm/cv-alchemist-2.0)
             - [💼 LinkedIn](https://www.linkedin.com/in/vanesamizrahi)
         """)
