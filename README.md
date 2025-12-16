@@ -59,7 +59,7 @@ El proyecto forma parte del módulo **Prompt Engineering** de CoderHouse y demue
 
 ## 📑 Presentación del Proyecto (PPT)
 
-Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
+Para ver la presentación utilizada en la entrega final del curso, accedé aquí:
 
 👉 [**Google Slides**](https://docs.google.com/presentation/d/1eEIGp8-rix1Tz2_vwm3lCRcLPKQTEXyUOgclLZ90vF0/edit?usp=sharing)
 
@@ -83,11 +83,11 @@ Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
 
 - La aplicación se **desarrolló en Streamlit**, que facilita interfaces web sin necesidad de frameworks complejos
 - La integración con modelos de IA se **realiza mediante llamadas a API** (Gemini u OpenAI)
-- El costo es controlable: el flujo requiere **solo dos llamadas principales**, lo cual es económico
+- El costo es controlable: el flujo requiere **hasta cuatro llamadas especializadas** (Maestro → LinkedIn → Target → ATS), manteniendo costos predecibles
 - Las librerías necesarias (PyPDF2, Streamlit, etc.) son gratuitas
 - El proyecto **escaló de forma natural** desde el [MVP anterior](https://github.com/vanerm/cv-alchemist) (realizado en el curso previo de Prompt Engineering I de CoderHouse), hacia una aplicación web configurable
 
-### 🚀 Evolución respecto al MVP previo
+### 🚀 Evolución respecto al MVP previo (Prompt Engineering I)
 
 - **Migración completada** del flujo del MVP en Colab a una aplicación web interactiva
 - **Modularización completa** (servicios, prompts, extracción, utils)
@@ -95,6 +95,10 @@ Para ver la presentación utilizada en la pre-entrega del curso, accedé aquí:
 - **Incorporación** de un formulario guiado para crear el CV si el usuario no tiene un PDF
 - **Integración completa** con modelos de IA (OpenAI / Gemini)
 - **Deploy exitoso** en Streamlit Community Cloud
+- **Arquitectura de 4 prompts especializados** con reglas anti-alucinaciones
+- **Sistema de análisis ATS** con scoring cuantitativo 0-100
+- **Templates profesionales personalizables** con compatibilidad ATS
+- **Interfaz de usuario avanzada** con progreso en tiempo real
 
 ---
 
@@ -175,11 +179,11 @@ Crear un archivo `.env` en la raíz del proyecto:
 ```bash
 # API Primaria (OpenAI)
 OPENAI_API_KEY=tu_openai_api_key_aqui
-OPENAI_MODEL=gpt-4o-mini
+OPENAI_MODEL=gpt-4o
 
 # API Fallback (Gemini) - Opcional
 GEMINI_API_KEY=tu_gemini_api_key_aqui
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=gemini-pro-latest
 ```
 
 **Notas:**
@@ -387,17 +391,6 @@ Ambas opciones siguen la misma estructura de 6 pasos:
   - Adaptable a diferentes tamaños de pantalla
   - Optimizado para desktop y mobile
   - Componentes que se reorganizan según el espacio disponible
-
----
-
-## 🧱 Versión Anterior del Proyecto (MVP – Prompt Engineering I)
-
-Este proyecto es una evolución de la primera versión del MVP desarrollada durante el curso Prompt Engineering I.
-
-Podés ver el repositorio original aquí:  
-👉 [cv-alchemist (MVP 2025)](https://github.com/vanerm/cv-alchemist)
-
-La versión 2.0 incorpora nuevas funcionalidades, mejor arquitectura interna y un enfoque más completo para la creación y optimización de CVs utilizando IA.
 
 ---
 
