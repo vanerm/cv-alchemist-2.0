@@ -324,14 +324,11 @@ def main():
         if st.button("🔄 Reiniciar", key="reset_button", help="Borrar todo y empezar de cero"):
             # Incrementar contador de reset para forzar recreación de file uploaders
             reset_count = st.session_state.get("reset_count", 0)
-            # Guardar la selección actual del modo antes de limpiar
-            current_mode = st.session_state.get("mode_selection", "Subir un CV existente (PDF)")
-            # Limpiar todo el session_state
+            # Limpiar COMPLETAMENTE el session_state (incluyendo modo seleccionado)
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
-            # Restaurar contador incrementado y modo seleccionado
+            # Solo restaurar contador incrementado
             st.session_state["reset_count"] = reset_count + 1
-            st.session_state["mode_selection"] = current_mode
             st.rerun()
     
     # Inicializar contador de reset si no existe
@@ -341,11 +338,13 @@ def main():
     option = st.radio(
         "Seleccione una opción:",
         ["Subir un CV existente (PDF)", "Crear CV desde cero"],
-        key="mode_selection",
+        key=f"mode_selection_{st.session_state.get('reset_count', 0)}",
+        index=0,  # Forzar siempre el primer elemento como default
         label_visibility="collapsed"
     )
     
     # Detectar cambio de modo y limpiar datos para evitar inconsistencias
+    current_mode_key = f"mode_selection_{st.session_state.get('reset_count', 0)}"
     if "previous_mode" not in st.session_state:
         st.session_state["previous_mode"] = option
     
