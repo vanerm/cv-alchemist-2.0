@@ -91,24 +91,49 @@ def create_sidebar():
         st.markdown("### 📍 Progreso")
         
         # Verificar estado de formación e idiomas
+        cv_loaded = st.session_state.get("pdf_text_clean") is not None
         studies_state = st.session_state.get("studies_text_clean")
-        has_training_content = studies_state is not None and studies_state != ""
-        training_skipped = studies_state == ""
         
+        # Lógica de formación:
+        # - has_training_content: Hay PDFs de formación procesados
+        # - training_skipped: Se omitió explícitamente (studies_text_clean == "" y CV cargado)
+        has_training_content = studies_state is not None and studies_state != ""
+        training_skipped = cv_loaded and studies_state == ""
+        
+        # Lógica de idiomas mejorada:
         languages_added = st.session_state.get("languages_added", False)
-        languages_skipped = languages_added and "**Idiomas**" not in st.session_state.get("pdf_text_clean", "")
-        languages_completed = languages_added and "**Idiomas**" in st.session_state.get("pdf_text_clean", "")
+        pdf_text = st.session_state.get("pdf_text_clean", "") or ""
+        
+        # Verificar si hay idiomas en el CV (tanto agregados manualmente como del formulario)
+        has_languages_in_cv = "**Idiomas**" in pdf_text or "Idiomas:" in pdf_text
+        
+        # Estados de idiomas:
+        # - languages_completed: Se agregaron idiomas al CV
+        # - languages_skipped: Se omitieron explícitamente O no hay idiomas en formulario
+        # - languages_not_processed: Aún no se ha procesado la sección de idiomas
+        languages_completed = languages_added and has_languages_in_cv
+        languages_skipped = languages_added and not has_languages_in_cv
+        languages_not_processed = not languages_added and cv_loaded
+        
+        # Solo mostrar el paso de idiomas si el CV está cargado
+        show_languages_step = cv_loaded
         
         # Definir pasos con estados especiales
         steps = [
-            ("1️⃣ Cargar/Crear CV", st.session_state.get("pdf_text_clean") is not None, False),
+            ("1️⃣ Cargar/Crear CV", cv_loaded, False),
             ("2️⃣ Formación (opcional)", has_training_content, training_skipped),
-            ("🌍 Idiomas (opcional)", languages_completed, languages_skipped),
+        ]
+        
+        # Solo agregar el paso de idiomas si el CV está cargado
+        if show_languages_step:
+            steps.append(("🌍 Idiomas (opcional)", languages_completed, languages_skipped))
+        
+        steps.extend([
             ("3️⃣ CV Maestro", st.session_state.get("cv_master") is not None, False),
             ("4️⃣ Perfil LinkedIn", st.session_state.get("linkedin_profile") is not None, False),
             ("5️⃣ CV Target", st.session_state.get("cv_target") is not None, False),
             ("6️⃣ Análisis ATS", st.session_state.get("ats_analysis") is not None or st.session_state.get("ats_analysis_form") is not None, False),
-        ]
+        ])
         
         for step_name, completed, skipped in steps:
             if completed:

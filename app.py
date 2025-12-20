@@ -1352,7 +1352,12 @@ def main():
                 st.session_state["cv_master"] = None
                 st.session_state["linkedin_profile"] = None
                 st.session_state["cv_target"] = None
-                st.session_state["languages_added"] = True  # Marcar idiomas como procesados en formulario
+                
+                # Marcar idiomas como procesados solo si realmente hay idiomas en el CV
+                has_languages_in_form = "**Idiomas**" in cv_base_text
+                # En el formulario, siempre marcar como procesados (con o sin idiomas)
+                st.session_state["languages_added"] = True
+                
                 st.session_state["show_success_form"] = True
                 st.rerun()
         
@@ -1399,7 +1404,7 @@ def main():
             has_studies = st.session_state.get("studies_text_clean") not in [None, ""]
             
             if st.button(
-                "➡️ Omitir formación y generar CV Maestro",
+                "➡️ Omitir formación y continuar",
                 disabled=has_studies,
                 help="Ya se procesaron PDFs de formación" if has_studies else "Continuar sin agregar formación adicional",
                 key="skip_studies_form"
@@ -1415,11 +1420,119 @@ def main():
             if st.session_state.get("show_info_skip_form"):
                 st.info("Formación omitida. Ahora puedes generar el CV Maestro.")
                 st.session_state["show_info_skip_form"] = False
+                
+                # En el flujo del formulario, marcar idiomas como procesados automáticamente
+                # ya que se manejan en el formulario inicial
+                if not st.session_state.get("languages_added", False):
+                    st.session_state["languages_added"] = True
+            
+            # ------------------------------------------------------------------
+            # Sección de idiomas (opcional) - Solo si formación fue procesada/omitida
+            # ------------------------------------------------------------------
+            if st.session_state.get("studies_text_clean") is not None:
+                
+                # Solo mostrar si no se han agregado idiomas desde el formulario inicial
+                current_has_languages = "**Idiomas**" in st.session_state.get("pdf_text_clean", "")
+                languages_processed = st.session_state.get("languages_added", False)
+                
+                # Solo mostrar esta sección si estamos en el flujo de PDF (no formulario)
+                # En el formulario, los idiomas ya se procesan en el paso 1
+                is_pdf_flow = st.session_state.get("pdf_text_raw") != st.session_state.get("pdf_text_clean")
+                
+                if not languages_processed and is_pdf_flow:
+                    st.markdown("### 2.1) Agregar idiomas adicionales (opcional)")
+                    
+                    # Listas de idiomas y niveles
+                    idiomas_disponibles = [
+                        "Español", "Inglés", "Portugués", "Francés", "Italiano", "Alemán", 
+                        "Chino (Mandarín)", "Japonés", "Coreano", "Árabe", "Ruso", "Holandés", 
+                        "Sueco", "Noruego", "Danés", "Finlandés", "Polaco", "Checo", "Húngaro", 
+                        "Griego", "Turco", "Hindi", "Tailandés", "Vietnamita", "Otro"
+                    ]
+                    
+                    niveles_idioma = [
+                        "Básico (A1)", "Elemental (A2)", "Intermedio (B1)", 
+                        "Intermedio Alto (B2)", "Avanzado (C1)", "Nativo/Bilingüe (C2)"
+                    ]
+                    
+                    if current_has_languages:
+                        st.info("🌍 Ya tienes idiomas en tu CV del formulario. Puedes agregar más o continuar.")
+                    
+                    n_lang_form = st.number_input(
+                        "Cantidad de idiomas adicionales",
+                        min_value=0,
+                        max_value=10,
+                        value=0,
+                        step=1,
+                        key="n_lang_form"
+                    )
+                    
+                    languages_form = []
+                    for i in range(int(n_lang_form)):
+                        st.markdown(f"**Idioma adicional {i+1}**")
+                        col_idioma, col_nivel = st.columns(2)
+                        
+                        with col_idioma:
+                            idioma = st.selectbox(
+                                f"Idioma {i+1}",
+                                idiomas_disponibles,
+                                key=f"idioma_form_{i}",
+                            )
+                            
+                            if idioma == "Otro":
+                                idioma = st.text_input(
+                                    f"Especificar idioma {i+1}",
+                                    key=f"idioma_form_otro_{i}",
+                                    placeholder="Ej: Catalán, Euskera, etc."
+                                )
+                        
+                        with col_nivel:
+                            nivel = st.selectbox(
+                                f"Nivel {i+1}",
+                                niveles_idioma,
+                                key=f"nivel_form_{i}",
+                            )
+                        
+                        if idioma and nivel:
+                            languages_form.append(f"{idioma}: {nivel}")
+                    
+                    # Botones de acción
+                    col_add, col_skip = st.columns(2)
+                    
+                    with col_add:
+                        if languages_form and st.button("Agregar idiomas al CV", key="add_languages_form"):
+                            if current_has_languages:
+                                # Agregar a la sección existente
+                                languages_text = "\n" + "\n".join(languages_form)
+                                st.session_state["pdf_text_clean"] += languages_text
+                            else:
+                                # Crear nueva sección
+                                languages_text = "\n\n**Idiomas**\n" + "\n".join(languages_form)
+                                st.session_state["pdf_text_clean"] += languages_text
+                            
+                            st.session_state["languages_added"] = True
+                            st.session_state["show_success_languages_form"] = True
+                            st.rerun()
+                    
+                    with col_skip:
+                        if st.button("➡️ Omitir idiomas", key="skip_languages_form"):
+                            st.session_state["languages_added"] = True
+                            st.session_state["show_info_skip_languages_form"] = True
+                            st.rerun()
+                    
+                    # Mostrar mensajes después del rerun
+                    if st.session_state.get("show_success_languages_form"):
+                        st.success("✅ Idiomas agregados correctamente al CV base.")
+                        st.session_state["show_success_languages_form"] = False
+                    
+                    if st.session_state.get("show_info_skip_languages_form"):
+                        st.info("Idiomas omitidos. Ahora puedes generar el CV Maestro.")
+                        st.session_state["show_info_skip_languages_form"] = False
             
             # ----------------------------------------------------------------------
-            # Paso 3: Generar CV Maestro (solo si formación fue procesada o omitida)
+            # Paso 3: Generar CV Maestro (solo si formación fue procesada o omitida Y idiomas procesados/omitidos)
             # ----------------------------------------------------------------------
-            if st.session_state.get("studies_text_clean") is not None:
+            if st.session_state.get("studies_text_clean") is not None and st.session_state.get("languages_added", False):
                 
                 st.markdown("### 3) Generar CV Maestro con IA")
                 
