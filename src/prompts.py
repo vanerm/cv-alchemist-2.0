@@ -4,7 +4,7 @@ from textwrap import dedent
 
 def build_prompt_master(cv_text: str, new_studies: str) -> str:
     """
-    Construye el prompt para generar el CV Maestro actualizado.
+    Construye el prompt para generar el CV Maestro actualizado con optimizaciones ATS.
 
     El lector debe pasar:
     - cv_text: texto del CV base (extraído del PDF o creado desde cero).
@@ -12,67 +12,94 @@ def build_prompt_master(cv_text: str, new_studies: str) -> str:
 
     El resultado estará pensado como CV formal:
     - Estilo ejecutivo, conciso y compatible con sistemas ATS.
-    - Secciones claras (Resumen, Experiencia, Educación, Proyectos, Aptitudes, etc.).
+    - Secciones claras con logros cuantificables al inicio.
+    - Estructura optimizada para parsing automático.
     """
     prompt = f"""
-    Actúa como un experto redactor de CVs y orientador profesional de alto nivel.
+    Actúa como un experto redactor de CVs y orientador profesional de alto nivel,
+    especializado en optimización ATS (Applicant Tracking Systems).
 
     Tu tarea es analizar dos documentos: el CV base de una persona y el contenido
     de un nuevo programa de estudios que ha completado.
 
     Tu misión es crear una nueva versión del CV, un "CV Maestro", que integre de forma
-    profesional y coherente la nueva formación.
+    profesional y coherente la nueva formación, siguiendo las mejores prácticas ATS.
+
+    ESTRUCTURA OPTIMIZADA ATS:
+    1. **Información de contacto** (sin título "Contacto")
+    2. **Extracto/Resumen Profesional** (2-3 líneas, orientado a logros)
+    3. **Experiencia Profesional** (con logros cuantificables al inicio de cada puesto)
+    4. **Proyectos Destacados** (si aplican, con resultados medibles)
+    5. **Educación** (títulos, certificaciones, cursos relevantes)
+    6. **Aptitudes Técnicas** (herramientas, tecnologías, metodologías)
+    7. **Idiomas** (si aplican)
+
+    REGLAS DE OPTIMIZACIÓN ATS:
+    
+    **Para cada puesto en Experiencia Profesional:**
+    - ESTRUCTURA OBLIGATORIA para cada puesto:
+      1. Primera línea: **Empresa — Puesto**
+      2. Segunda línea: Ubicación · Fechas
+      3. PRIMERA viñeta: Logro cuantificable con métrica específica
+      4. Siguientes viñetas: Responsabilidades y tareas
+      5. Última viñeta (opcional): Tecnologías/herramientas utilizadas
+    
+    - EJEMPLOS de logros cuantificables (PRIMER bullet):
+      • "Incrementé la eficiencia operativa en 30% mediante automatización de procesos"
+      • "Reduje errores de auditoría en 20% implementando nuevo sistema de validación"
+      • "Optimicé tiempos de respuesta en 25% mejorando flujos de trabajo"
+      • "Lideré auditoría de 500+ prestaciones médicas con 98% de precisión"
+    
+    - Si NO hay métricas explícitas en el CV base, NO inventes números ni porcentajes:
+      • Mantén la descripción original sin agregar métricas inventadas
+      • Solo reformula para mejorar la redacción sin cambiar el significado
+      • Ejemplo: "Mejoré procesos" → "Optimicé procesos operativos del área"
+      • PROHIBIDO: Agregar "30%", "25%", "20%" o cualquier número no mencionado
+    
+    - SOLO usa métricas si están EXPLÍCITAMENTE en el CV base:
+      • Si dice "reduje errores", NO agregues porcentaje
+      • Si dice "mejoré eficiencia", NO agregues "en X%"
+      • Si dice "lideré equipo", NO agregues "de X personas"
+    
+    **Para Proyectos Destacados:**
+    - Enfócate en resultados e impacto medible
+    - Menciona tecnologías y metodologías utilizadas
+    - Incluye enlaces si están disponibles
+    
+    **Para el Extracto/Resumen:**
+    - Máximo 3 líneas
+    - Incluye años de experiencia, área de especialización y logro principal
+    - Evita frases genéricas, enfócate en valor agregado específico
 
     Indicaciones clave:
-    - Respeta estrictamente el estilo, orden y estructura del CV base. No reescribas
-      secciones completas salvo para integrar la nueva formación y mejorar la claridad.
-    - No añadas habilidades, tecnologías, herramientas, metodologías o aptitudes
-      que no estén explícitamente presentes en el CV base o en los documentos de formación.
-    - No inventes experiencia laboral, funciones, logros, títulos, cargos
-      ni certificaciones.
+    - Respeta estrictamente la información factual del CV base
+    - Integra la nueva formación de manera coherente y profesional
+    - Mejora la presentación y estructura sin inventar información
+    - Prioriza la legibilidad para sistemas ATS y reclutadores
 
     Reglas CRÍTICAS para evitar alucinaciones:
     - No inventes experiencia, funciones, logros ni títulos que no estén en el CV base
-      o en los documentos de formación.
+      o en los documentos de formación
     - No añadas tecnologías, herramientas, lenguajes de programación ni metodologías
-      que no aparezcan en el CV base o en la nueva formación.
-    - No modifiques nombres de empresas, cargos, fechas ni duración de los empleos.
-    - No atribuyas a ningún puesto actividades avanzadas (por ejemplo, uso de nuevas
-      tecnologías especializadas, liderazgo de equipos, análisis cuantitativo complejo
-      o diseño de modelos) si dichas actividades no están explícitamente descritas
-      en la experiencia laboral del CV base.
-    - Si el CV base o la nueva formación mencionan nuevas áreas técnicas, herramientas
-      o metodologías solo en cursos, proyectos o certificaciones, puedes mencionarlas
-      como parte de la formación o de los proyectos, pero NO como tareas formales
-      realizadas en empleos pasados o actuales, a menos que se indique claramente.
-    - El resumen profesional y las secciones deben dejar claro, cuando aplique,
-      que se trata de una transición de carrera hacia un nuevo rol, y que parte
-      de la experiencia práctica proviene de proyectos y formación, no de
-      experiencia laboral directa.
+      que no aparezcan en el CV base o en la nueva formación
+    - No modifiques nombres de empresas, cargos, fechas ni duración de los empleos
+    - Si agregas métricas o logros cuantificables, deben estar basados en información
+      explícita del CV base o ser reformulaciones conservadoras de logros ya mencionados
+    - No atribuyas a ningún puesto actividades avanzadas que no estén explícitamente
+      descritas en la experiencia laboral del CV base
+    - IDIOMAS: NO agregues idiomas que no estén explícitamente mencionados en el CV base
+      o documentos de formación. NO asumas idioma nativo por país. Si no hay sección
+      de idiomas en el CV base, NO crees una sección de idiomas
 
-    Estilo y estructura:
-    - Mantén un tono profesional, claro y directo.
-    - Prioriza frases concisas y fáciles de escanear.
-    - Organiza el resultado en secciones típicas de CV formal, por ejemplo:
-        * Resumen Profesional
-        * Experiencia Profesional
-        * Educación
-        * Proyectos Relevantes (si aplican)
-        * Aptitudes Técnicas / Habilidades
-        * Certificaciones (si las hubiera)
-    - Usa viñetas para describir responsabilidades y logros cuando sea posible.
-    - Evita párrafos muy largos; el CV debe ser fácil de leer en pocos segundos.
-    - El resultado debe ser adecuado para exportarse a PDF y ser usado en postulaciones.
-    - El resumen profesional debe ser breve, conciso y orientado a logros.
-    - Evita expresiones excesivamente emocionales (por ejemplo, "me apasiona",
-      "me encanta"). Prefiere un tono técnico, neutro y profesional.
-    - Si el CV base incluye expresiones emocionales, puedes reescribirlas en un tono
-      profesional y orientado a resultados, manteniendo el sentido pero reduciendo
-      la carga emocional.
-    - IMPORTANTE: NO agregues títulos o etiquetas como "Contactar", "Contacto",
-      "Información de Contacto" antes del nombre y datos personales. El nombre y
-      la información de contacto deben aparecer directamente al inicio sin ningún
-      título previo.
+    Estilo y formato ATS-friendly:
+    - Usa formato de texto plano con secciones claramente diferenciadas
+    - IMPORTANTE: Los títulos de sección DEBEN usar el formato **Título de Sección**
+    - Ejemplo: **Extracto**, **Experiencia Profesional**, **Educación**, **Proyectos Destacados**
+    - Emplea viñetas (•) para listas y descripciones
+    - Mantén consistencia en fechas (MM/YYYY - MM/YYYY)
+    - Evita tablas, columnas complejas, gráficos o elementos visuales
+    - Usa palabras clave relevantes de manera natural (no keyword stuffing)
+    - Prioriza verbos de acción: desarrollé, implementé, optimicé, lideré, etc.
 
     A continuación se incluyen los documentos:
 
@@ -85,7 +112,7 @@ def build_prompt_master(cv_text: str, new_studies: str) -> str:
     --- FIN DEL PROGRAMA DE ESTUDIOS ---
 
     Devuelve únicamente el texto completo del CV Maestro actualizado,
-    listo para copiar y pegar en una plantilla de CV.
+    optimizado para ATS y listo para copiar y pegar en una plantilla de CV.
     No añadas comentarios, explicaciones ni encabezados externos.
     El formato debe ser texto plano con secciones claramente diferenciadas.
     """
