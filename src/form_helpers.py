@@ -294,6 +294,28 @@ def get_cv_form_data() -> str | None:
     if not nombre.strip() or not email.strip():
         st.warning("Por favor completá al menos el nombre completo y el email.")
         return None
+    
+    # Validar contenido mínimo (más flexible para perfiles junior)
+    has_experience = any(j["puesto"] and j["empresa"] and j["responsabilidades"] for j in jobs)
+    has_education = any(e["titulo"] and e["institucion"] for e in educations)
+    has_projects = any(p["nombre"] and p["descripcion"] for p in projects)
+    has_skills = habilidades.strip()
+    has_summary = resumen.strip()
+    has_headline = titular.strip()
+    
+    # Contar secciones con contenido sustancial
+    content_sections = sum([has_experience, has_education, has_projects, bool(has_skills)])
+    
+    # Advertencia para datos mínimos pero permite continuar
+    if content_sections == 0 and not (has_summary or has_headline):
+        st.warning(
+            "**⚠️ Datos mínimos detectados:** El CV tendrá contenido limitado.\n"
+            "Para mejorar el resultado, considera agregar:\n"
+            "- Experiencia laboral (aunque sea prácticas o medio tiempo)\n"
+            "- Educación o cursos realizados\n"
+            "- Proyectos personales o académicos\n"
+            "- Habilidades técnicas y blandas"
+        )
 
     # ------------------------------------------------------------------
     # Construcción del texto del CV

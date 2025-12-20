@@ -613,8 +613,21 @@ def main():
                         with st.spinner(f"Generando CV Target con {model_name}..."):
                             cv_target = generate_cv_output(prompt_target, model=model, provider=provider)
 
-                        st.session_state["cv_target"] = cv_target
-                        st.rerun()
+                        # Verificar si hay datos insuficientes
+                        if cv_target.strip() == "ERROR_DATOS_INSUFICIENTES":
+                            st.warning(
+                                "⚠️ **CV Target con datos mínimos**\n\n"
+                                "Se generará un CV básico solo con los datos disponibles. "
+                                "El análisis ATS mostrará un score bajo debido al contenido limitado.\n\n"
+                                "**Para mejorar:** Agrega más secciones en el formulario."
+                            )
+                            # Generar CV mínimo sin inventar contenido
+                            cv_target_minimal = st.session_state["cv_master"]
+                            st.session_state["cv_target"] = cv_target_minimal
+                            st.rerun()
+                        else:
+                            st.session_state["cv_target"] = cv_target
+                            st.rerun()
 
                 if st.session_state.get("cv_target"):
                     st.text_area(
@@ -993,6 +1006,26 @@ def main():
         )
 
         submitted = st.button("Validar y continuar")
+        
+        # Mostrar sugerencia si hay datos mínimos
+        if full_name.strip() and email.strip():
+            has_experience = any(exp.get("role") and exp.get("company") and exp.get("description") for exp in experiences)
+            has_education = any(edu.get("degree") and edu.get("institution") for edu in educations)
+            has_projects = any(proj.get("name") and proj.get("description") for proj in projects)
+            has_skills = skills.strip()
+            has_summary = summary.strip()
+            has_headline = headline.strip()
+            
+            content_sections = sum([has_experience, has_education, has_projects, bool(has_skills)])
+            
+            if content_sections == 0 and not (has_summary or has_headline):
+                st.info(
+                    "💡 **Sugerencia para perfiles junior:** Si no tienes experiencia laboral, puedes:\n"
+                    "- Agregar proyectos personales o académicos\n"
+                    "- Completar habilidades técnicas y blandas\n"
+                    "- Escribir un resumen que describa tu perfil objetivo\n"
+                    "- Incluir educación formal o cursos realizados"
+                )
 
         # Procesar envío del formulario
         if submitted:
@@ -1074,6 +1107,23 @@ def main():
             is_valid, error_msg = validate_text_length(skills, 0, 1000, "Habilidades")
             if not is_valid:
                 errors.append(f"❌ {error_msg}")
+            
+            # Validar contenido mínimo (flexible para perfiles junior)
+            has_experience = any(exp.get("role") and exp.get("company") and exp.get("description") for exp in experiences)
+            has_education = any(edu.get("degree") and edu.get("institution") for edu in educations)
+            has_projects = any(proj.get("name") and proj.get("description") for proj in projects)
+            has_skills = skills.strip()
+            has_summary = summary.strip()
+            has_headline = headline.strip()
+            
+            content_sections = sum([has_experience, has_education, has_projects, bool(has_skills)])
+            
+            # Validación flexible: permite perfiles con al menos 1 sección + contexto
+            if content_sections == 0 and not (has_summary or has_headline):
+                errors.append(
+                    "❌ Contenido insuficiente: Completa al menos una sección (Experiencia, Educación, "
+                    "Proyectos o Habilidades) O un resumen/titular detallado para generar un CV útil."
+                )
             
             # Mostrar errores o procesar
             if errors:
@@ -1339,8 +1389,21 @@ def main():
                         with st.spinner(f"Generando CV Target con {model_name}..."):
                             cv_target = generate_cv_output(prompt_target, model=model, provider=provider)
 
-                        st.session_state["cv_target"] = cv_target
-                        st.rerun()
+                        # Verificar si hay datos insuficientes
+                        if cv_target.strip() == "ERROR_DATOS_INSUFICIENTES":
+                            st.warning(
+                                "⚠️ **CV Target con datos mínimos**\n\n"
+                                "Se usará el CV Maestro como base. "
+                                "El análisis ATS mostrará un score bajo debido al contenido limitado.\n\n"
+                                "**Para mejorar:** Completa más secciones en el formulario."
+                            )
+                            # Usar CV Maestro como CV Target mínimo
+                            cv_target_minimal = st.session_state["cv_master"]
+                            st.session_state["cv_target"] = cv_target_minimal
+                            st.rerun()
+                        else:
+                            st.session_state["cv_target"] = cv_target
+                            st.rerun()
 
                 if st.session_state.get("cv_target"):
                     st.text_area(

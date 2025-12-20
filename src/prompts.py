@@ -153,6 +153,21 @@ def build_prompt_targeted(master_cv: str, job_description: str) -> str:
     {job_description}
     --- FIN DE LA DESCRIPCIÓN DEL PUESTO ---
 
+    VALIDACIÓN PREVIA OBLIGATORIA:
+    Antes de generar el CV Target, verifica que el CV Maestro contenga información
+    sustancial más allá de datos de contacto básicos (nombre, email, teléfono).
+    
+    Si el CV Maestro SOLO contiene datos de contacto básicos (nombre, email) 
+    SIN NINGUNA de estas secciones con contenido:
+    - Experiencia laboral (aunque sea prácticas o trabajos de medio tiempo)
+    - Educación (formal, cursos, certificaciones)
+    - Proyectos (académicos, personales, voluntariado)
+    - Habilidades técnicas o blandas
+    - Resumen profesional que describa objetivos o fortalezas
+    - Titular que indique perfil objetivo
+    
+    Entonces NO generes un CV Target y devuelve exactamente: "ERROR_DATOS_INSUFICIENTES"
+
     REGLAS OBLIGATORIAS (NO ROMPER NINGUNA):
 
     1) Veracidad total:
@@ -193,7 +208,8 @@ def build_prompt_targeted(master_cv: str, job_description: str) -> str:
        - Habilidades / Aptitudes
 
     SALIDA ESPERADA:
-    - Genera únicamente el texto final del CV Target.
+    - Si el CV Maestro tiene datos suficientes: genera únicamente el texto final del CV Target.
+    - Si el CV Maestro tiene datos insuficientes: devuelve exactamente "ERROR_DATOS_INSUFICIENTES"
     - Sin explicaciones, sin comentarios y sin notas para la persona usuaria.
     - El resultado debe ser apto para pegarse directamente en una plantilla de CV.
     """
@@ -270,11 +286,10 @@ def build_prompt_linkedin_profile(master_cv: str) -> str:
     1) TITULAR (HEADLINE)
        - Máximo 120 caracteres.
        - Claro, profesional y fácil de entender.
-       - No inventes tecnologías ni roles que no aparezcan en el CV Maestro.
-       - Puedes mencionar formación en nuevas áreas (por ejemplo, un área técnica
-         o de negocio distinta a la experiencia principal) si está en estudios
-         o proyectos, pero no afirmes que el rol actual incluye esas tareas
-         si el CV no lo dice.
+       - SOLO usa información que aparezca explícitamente en el CV Maestro.
+       - NO inventes tecnologías, áreas de especialización, roles o campos profesionales.
+       - NO asumas formación técnica o de cualquier tipo si no está explícitamente mencionada.
+       - Si el CV tiene poca información, mantén el titular genérico y profesional.
 
     2) ACERCA DE (ABOUT)
        Debes devolver DOS versiones:
@@ -283,25 +298,19 @@ def build_prompt_linkedin_profile(master_cv: str) -> str:
        
        Indicaciones:
        - Tono cálido, humano y profesional (apto para LinkedIn).
-       - Menciona fortalezas reales basadas en el CV (por ejemplo:
-         experiencia en determinados tipos de proyectos, responsabilidades
-         en roles previos, formación relevante, etc.).
-       - No afirmes que la persona aplica herramientas, metodologías o tecnologías
-         específicas en su trabajo actual si el CV Maestro no lo indica explícitamente.
-       - Puedes mencionar que está en formación o que realizó proyectos prácticos
-         si eso figura en educación o proyectos.
+       - SOLO menciona fortalezas que estén explícitamente descritas en el CV Maestro.
+       - NO inventes experiencia en proyectos, responsabilidades o formación.
+       - NO asumas áreas de especialización, sectores o campos profesionales.
+       - Si el CV tiene información limitada, mantén el contenido genérico y enfocado en objetivos profesionales generales.
+       - NO menciones "formación técnica", "área de datos", "tecnología" o similares a menos que estén explícitamente en el CV.
 
     3) HABILIDADES (SKILLS)
        - Devuelve una lista de habilidades técnicas y blandas.
-       - SOLO puedes incluir habilidades que aparezcan directa o indirectamente en:
-         * Experiencia profesional
-         * Educación
-         * Proyectos
-         * Certificaciones
-       - No inventes herramientas, lenguajes ni frameworks.
-       - Si una habilidad solo aparece en proyectos o formación, aclárala de manera
-         coherente con eso (es válido como skill, pero no lo vincules al rol actual
-         si no está indicado).
+       - EXCLUSIVAMENTE incluye habilidades que aparezcan LITERALMENTE escritas en el CV Maestro.
+       - NO deduzcas, asumas o generalices habilidades.
+       - NO inventes herramientas, lenguajes, frameworks, metodologías o competencias.
+       - Si el CV no menciona habilidades específicas, incluye solo habilidades genéricas como "Comunicación", "Trabajo en equipo", "Resolución de problemas".
+       - NO agregues habilidades técnicas si no están explícitamente mencionadas.
 
     4) DESTACADOS RECOMENDADOS (FEATURED)
        - Selecciona hasta 5 elementos del CV Maestro que podrían ir en “Destacados”:
@@ -314,13 +323,13 @@ def build_prompt_linkedin_profile(master_cv: str) -> str:
        - No inventes enlaces ni proyectos.
 
     Reglas CRÍTICAS para evitar alucinaciones:
-    - No inventes tareas ni responsabilidades en empresas.
-    - No digas que la persona usa herramientas o metodologías específicas
-      en su rol actual si el CV Maestro no lo indica explícitamente.
-    - Si el conocimiento en ciertos temas aparece en proyectos, cursos o diplomaturas,
-      delimítalo claramente como formación o práctica en proyectos, no como experiencia
-      laboral profesional.
-    - No agregues certificaciones, cursos o herramientas que no existan en el CV Maestro.
+    - PROHIBIDO ABSOLUTO: No inventes, asumas o deduzcas NINGUNA información que no esté explícitamente escrita en el CV Maestro.
+    - No inventes tareas, responsabilidades, tecnologías, herramientas, metodologías, áreas de especialización, cursos, certificaciones o habilidades.
+    - No asumas que alguien tiene "formación técnica" si no está explícitamente mencionada.
+    - No generalices ni categorices el perfil (ej: "profesional técnico", "área de datos", "sector tecnológico") si no está claramente indicado.
+    - Si el CV Maestro está prácticamente vacío (solo nombre, email, datos de contacto), genera un perfil genérico SIN mencionar áreas específicas.
+    - Usa SOLO las palabras exactas, términos y conceptos que aparecen literalmente en el CV Maestro.
+    - Si no hay suficiente información, es mejor ser genérico que inventar.
 
     FORMATO DE RESPUESTA (muy importante):
     Devuelve el resultado exactamente con esta estructura de secciones:

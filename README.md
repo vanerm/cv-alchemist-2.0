@@ -307,16 +307,16 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 
 ### 🔍 Análisis ATS Avanzado
 - **Scoring 0-100**: Evaluación cuantitativa de compatibilidad con sistemas ATS
-- **4 Criterios ponderados**: 
-  - Formato y estructura (25%): Parseabilidad y organización
-  - Palabras clave (40%): Coincidencia con términos del puesto
-  - Contenido y claridad (20%): Legibilidad y coherencia
-  - Optimización ATS (15%): Elementos técnicos de compatibilidad
-- **Análisis de palabras clave**: Identificación de términos encontrados vs faltantes
-- **Fortalezas y debilidades**: Evaluación detallada por cada criterio
-- **Recomendaciones accionables**: Sugerencias específicas y priorizadas para mejorar
+- **Detección automática de tipo de puesto**: Identifica si es entry-level/sin experiencia o con experiencia requerida
+- **Criterios adaptativos según tipo de puesto**:
+  - **Entry-level/Pasantías**: Educación (35%), Proyectos/Habilidades (30%), Palabras clave (25%), Formato (10%)
+  - **Con experiencia**: Experiencia (40%), Palabras clave (30%), Formato (20%), Educación (10%)
+- **Palabras clave inteligentes**: Detecta automáticamente términos como "pasante", "trainee", "sin experiencia", "entry level"
+- **Análisis contextual**: Valora proyectos académicos y formación para puestos junior
+- **Fortalezas y debilidades**: Evaluación detallada por cada criterio adaptado al tipo de puesto
+- **Recomendaciones específicas**: Sugerencias diferenciadas para perfiles junior vs senior
 - **Detalles expandibles**: Información completa por cada métrica evaluada
-- **Comparación con estándares**: Benchmarking contra mejores prácticas ATS
+- **Comparación con estándares**: Benchmarking realista según nivel de experiencia requerido
 
 ### 🤖 Sistema de Prompts Inteligentes
 - **Prompt Maestro avanzado**: 
@@ -410,7 +410,7 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 - [x] Validación avanzada de archivos PDF (tamaño, tipo, protección, contenido)
 - [x] Diseño visual profesional de PDFs (tipografía, colores, iconos, layout)
 - [x] Templates personalizables (Clásico, Moderno, Minimalista, Creativo)
-- [x] Análisis ATS con scoring, palabras clave y recomendaciones
+- [x] Análisis ATS con detección automática de puestos entry-level y scoring adaptativo
 - [x] Selector de modelo de IA en sidebar (OpenAI/Gemini/Auto)
 - [x] Múltiples modelos disponibles por proveedor
 - [x] Validación de formulario con regex (email, teléfono, URLs)
@@ -422,6 +422,11 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 - [x] Scripts de testing y debugging organizados en carpeta tests/
 - [x] Monitoreo de uso de RAM (183 MB máximo - óptimo para deploy)
 - [x] Deploy en Streamlit Community Cloud
+- [x] Detección automática de puestos entry-level en análisis ATS
+- [x] Criterios de scoring adaptativos según tipo de puesto
+- [x] Validación inclusiva para perfiles junior sin experiencia previa
+- [x] Corrección de generación de PDFs para mostrar información de contacto completa
+- [x] Prompts anti-alucinaciones reforzados para evitar inventar formación técnica
 
 ---
 

@@ -198,13 +198,29 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
     
     # FASE 3 & 4: Procesar header con diseño mejorado
     if header_lines:
-        # Primera línea = Nombre
+        # Inicializar lista de contacto
+        contact_parts = []
+        
+        # Primera línea = Nombre y contacto
         if header_lines:
             name_line = header_lines[0]
-            # Extraer nombre (antes del primer |)
-            name = name_line.split('|')[0].strip()
-            name = escape_html(name)
-            story.append(Paragraph(name, styles['CVName']))
+            
+            # Si la línea contiene |, separar nombre del resto
+            if '|' in name_line:
+                parts = [p.strip() for p in name_line.split('|')]
+                # Primer parte no vacía es el nombre
+                name = next((p for p in parts if p), "")
+                # Resto son datos de contacto
+                contact_parts = [p for p in parts[1:] if p]
+            else:
+                # Toda la línea es el nombre
+                name = name_line
+                contact_parts = []
+            
+            # Agregar nombre
+            if name:
+                name = escape_html(name)
+                story.append(Paragraph(name, styles['CVName']))
         
         # Segunda línea puede ser titular
         if len(header_lines) > 1 and '|' not in header_lines[1]:
@@ -214,16 +230,26 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         else:
             contact_start = 1
         
-        # Resto = Contacto (combinar en una línea)
-        contact_parts = []
+        # Procesar resto de líneas de contacto
         for line in header_lines[contact_start:]:
-            parts = [p.strip() for p in line.split('|')]
-            contact_parts.extend([p for p in parts if p and p not in contact_parts])
+            if '|' in line:
+                parts = [p.strip() for p in line.split('|')]
+                contact_parts.extend([p for p in parts if p])
+            else:
+                contact_parts.append(line)
         
+        # Mostrar información de contacto
         if contact_parts:
-            contact_text = ' • '.join(contact_parts)
-            contact_text = escape_html(contact_text)
-            story.append(Paragraph(contact_text, styles['ContactInfo']))
+            # Filtrar duplicados y vacíos
+            unique_contact = []
+            for part in contact_parts:
+                if part and part not in unique_contact:
+                    unique_contact.append(part)
+            
+            if unique_contact:
+                contact_text = ' • '.join(unique_contact)
+                contact_text = escape_html(contact_text)
+                story.append(Paragraph(contact_text, styles['ContactInfo']))
         
         # Línea divisoria después del header (si el template lo usa)
         if tmpl.use_dividers:

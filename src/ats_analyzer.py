@@ -38,8 +38,35 @@ def analyze_ats_compatibility(cv_content: str, job_description: str = "") -> Dic
     return result
 
 
+def _detect_entry_level_position(job_description: str) -> bool:
+    """Detecta si es un puesto entry-level/sin experiencia requerida."""
+    if not job_description:
+        return False
+    
+    job_lower = job_description.lower()
+    
+    entry_level_keywords = [
+        # Español
+        "pasante", "pasantía", "trainee", "practicante", "sin experiencia",
+        "entry level", "nivel inicial", "recién graduado", "primer empleo",
+        "estudiante", "aprendiz", "junior", "jr", "graduate program",
+        "sin experiencia previa", "no requiere experiencia", "0 años",
+        "0-1 años", "recien egresado", "egresado",
+        
+        # Inglés (común en tech)
+        "intern", "internship", "entry-level", "no experience required",
+        "recent graduate", "new grad", "apprentice", "trainee program",
+        "0 years", "0-1 years", "fresh graduate"
+    ]
+    
+    return any(keyword in job_lower for keyword in entry_level_keywords)
+
+
 def _build_ats_analysis_prompt(cv_content: str, job_description: str) -> str:
     """Construye el prompt para análisis ATS."""
+    
+    # Detectar si es puesto entry-level
+    is_entry_level = _detect_entry_level_position(job_description)
     
     job_section = ""
     if job_description.strip():
@@ -47,6 +74,54 @@ def _build_ats_analysis_prompt(cv_content: str, job_description: str) -> str:
 --- DESCRIPCIÓN DEL PUESTO ---
 {job_description}
 --- FIN DESCRIPCIÓN ---
+"""
+    
+    # Ajustar criterios según tipo de puesto
+    if is_entry_level:
+        criteria_weights = """
+**CRITERIOS PARA PUESTO ENTRY-LEVEL/SIN EXPERIENCIA (pesos ajustados):**
+
+**1. EDUCACIÓN Y FORMACIÓN (35 puntos)**
+- ¿Tiene educación formal relevante al puesto?
+- ¿Incluye cursos, certificaciones o formación adicional?
+- ¿La formación está actualizada y es pertinente?
+
+**2. PROYECTOS Y HABILIDADES (30 puntos)**
+- ¿Incluye proyectos académicos, personales o de práctica?
+- ¿Las habilidades técnicas coinciden con los requisitos?
+- ¿Demuestra conocimiento práctico aunque sea teórico?
+
+**3. PALABRAS CLAVE (25 puntos)**
+- ¿Contiene tecnologías, herramientas o conceptos del puesto?
+- ¿Menciona habilidades blandas relevantes?
+
+**4. FORMATO Y ESTRUCTURA (10 puntos)**
+- ¿Tiene secciones claramente identificadas?
+- ¿Es fácil de leer y parsear por ATS?
+
+NOTA: Para puestos entry-level, NO se penaliza la falta de experiencia laboral.
+Se valora potencial, formación y proyectos académicos/personales.
+"""
+    else:
+        criteria_weights = """
+**CRITERIOS PARA PUESTO CON EXPERIENCIA REQUERIDA (pesos estándar):**
+
+**1. EXPERIENCIA PROFESIONAL (40 puntos)**
+- ¿Tiene experiencia laboral relevante al puesto?
+- ¿Los logros están cuantificados y son específicos?
+- ¿La progresión profesional es coherente?
+
+**2. PALABRAS CLAVE (30 puntos)**
+- ¿Contiene palabras clave relevantes de la descripción del puesto?
+- ¿Las palabras clave aparecen en contexto apropiado?
+
+**3. FORMATO Y ESTRUCTURA (20 puntos)**
+- ¿Tiene secciones claramente identificadas?
+- ¿Evita elementos complejos que dificulten el parseo ATS?
+
+**4. EDUCACIÓN Y FORMACIÓN (10 puntos)**
+- ¿La educación es relevante y está actualizada?
+- ¿Incluye certificaciones pertinentes?
 """
     
     prompt = f"""
@@ -60,7 +135,20 @@ Tu tarea es analizar el siguiente CV y evaluar su compatibilidad con sistemas AT
 {cv_content}
 --- FIN DEL CV ---
 
-Debes evaluar los siguientes criterios y proporcionar un análisis detallado:
+DETECCIÓN AUTOMÁTICA: {'Este es un PUESTO ENTRY-LEVEL/SIN EXPERIENCIA REQUERIDA' if is_entry_level else 'Este es un PUESTO CON EXPERIENCIA REQUERIDA'}
+
+VALIDACIÓN PREVIA OBLIGATORIA:
+Antes de evaluar, verifica si el CV contiene información sustancial.
+Si el CV SOLO tiene datos de contacto (nombre, email) SIN NINGUNA sección con contenido
+(ni experiencia, ni educación, ni proyectos, ni habilidades, ni resumen), asigna automáticamente:
+- SCORE_ATS: 15
+- NIVEL: Crítico
+- Incluye en DEBILIDADES: "CV prácticamente vacío - falta experiencia, educación y proyectos"
+- Incluye en RECOMENDACIONES: "Completar todas las secciones con información detallada antes de postular"
+
+{criteria_weights}
+
+Debes evaluar los criterios correspondientes y proporcionar un análisis detallado:
 
 **1. FORMATO Y ESTRUCTURA (25 puntos)**
 - ¿Tiene secciones claramente identificadas? (Experiencia, Educación, Habilidades)
@@ -75,13 +163,16 @@ Debes evaluar los siguientes criterios y proporcionar un análisis detallado:
 {"- ¿Coincide con los requisitos técnicos del puesto?" if job_description else ""}
 
 **IMPORTANTE PARA PALABRAS CLAVE:**
-- Considera TODAS las variaciones y acrónimos comunes de términos técnicos
-- Ejemplos de equivalencias: palabra completa = minúsculas = acrónimo = traducción
-- Busca la palabra en TODO el CV (experiencia, proyectos, habilidades, educación)
-- Si encuentras el acrónimo de una palabra, considera que la palabra completa SÍ está presente
-- Si una palabra aparece en CUALQUIER sección del CV, NO la marques como faltante
-- Solo marca como faltante si ni la palabra completa NI su acrónimo aparecen en el CV
-- PRIORIZA contexto de experiencia/proyectos, pero ACEPTA también si está en habilidades
+- Si el CV tiene contenido insuficiente, no evalúes palabras clave detalladamente
+- Para puestos ENTRY-LEVEL: acepta palabras clave en educación, proyectos y habilidades con igual peso
+- Para puestos CON EXPERIENCIA: prioriza palabras clave en experiencia laboral
+- Para CVs con contenido adecuado:
+  - Considera TODAS las variaciones y acrónimos comunes de términos técnicos
+  - Ejemplos de equivalencias: palabra completa = minúsculas = acrónimo = traducción
+  - Busca la palabra en TODO el CV (experiencia, proyectos, habilidades, educación)
+  - Si encuentras el acrónimo de una palabra, considera que la palabra completa SÍ está presente
+  - Si una palabra aparece en CUALQUIER sección del CV, NO la marques como faltante
+  - Solo marca como faltante si ni la palabra completa NI su acrónimo aparecen en el CV
 
 **3. CONTENIDO Y CLARIDAD (20 puntos)**
 - ¿La experiencia está bien descrita con logros cuantificables?

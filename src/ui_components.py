@@ -177,13 +177,24 @@ def create_sidebar():
         
         with st.expander("🔍 Análisis ATS"):
             st.markdown("""
-                **Criterios evaluados:**
-                - Formato y estructura (25%)
-                - Palabras clave (40%)
-                - Contenido y claridad (20%)
-                - Optimización ATS (15%)
+                **🤖 Detección automática:**
+                - Entry-level vs Con experiencia
                 
-                **Score objetivo:** 80+
+                **Criterios adaptativos:**
+                
+                **Entry-level/Pasantías:**
+                - Educación (35%)
+                - Proyectos/Habilidades (30%)
+                - Palabras clave (25%)
+                - Formato (10%)
+                
+                **Con experiencia:**
+                - Experiencia (40%)
+                - Palabras clave (30%)
+                - Formato (20%)
+                - Educación (10%)
+                
+                **Score objetivo:** 70+ (realista)
             """)
         
         st.markdown("---")
