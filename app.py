@@ -270,6 +270,20 @@ def build_cv_text_from_form(data: dict) -> str:
     if skills:
         lines.append("**Habilidades**")
         lines.append(skills)
+        lines.append("")
+
+    # Idiomas
+    languages = data.get("languages", [])
+    if languages:
+        lines.append("**Idiomas**")
+        for lang in languages:
+            idioma = lang.get("language", "").strip()
+            nivel = lang.get("level", "").strip()
+            
+            if idioma and nivel:
+                lines.append(f"{idioma}: {nivel}")
+        
+        lines.append("")
 
     # Unimos todo
     return "\n".join(lines).strip()
@@ -355,7 +369,8 @@ def main():
             "cv_master", "linkedin_profile", "cv_target", "job_description_raw",
             "ats_analysis", "ats_analysis_form",
             "show_success_pdf", "show_success_studies", "show_success_form",
-            "show_success_studies_form", "show_info_skip", "show_info_skip_form"
+            "show_success_studies_form", "show_info_skip", "show_info_skip_form",
+            "languages_added", "show_success_languages", "show_info_skip_languages"
         ]
         for key in keys_to_clear:
             if key in st.session_state:
@@ -455,9 +470,96 @@ def main():
                 st.session_state["show_info_skip"] = False
 
             # ------------------------------------------------------------------
-            # Generar CV Maestro si existe formación procesada O si fue omitida
+            # Sección de idiomas (opcional)
             # ------------------------------------------------------------------
             if st.session_state.get("studies_text_clean") is not None:
+                st.markdown("### 2.1) Agregar idiomas (opcional)")
+                
+                # Listas de idiomas y niveles
+                idiomas_disponibles = [
+                    "Español", "Inglés", "Portugués", "Francés", "Italiano", "Alemán", 
+                    "Chino (Mandarín)", "Japonés", "Coreano", "Árabe", "Ruso", "Holandés", 
+                    "Sueco", "Noruego", "Danés", "Finlandés", "Polaco", "Checo", "Húngaro", 
+                    "Griego", "Turco", "Hindi", "Tailandés", "Vietnamita", "Otro"
+                ]
+                
+                niveles_idioma = [
+                    "Básico (A1)", "Elemental (A2)", "Intermedio (B1)", 
+                    "Intermedio Alto (B2)", "Avanzado (C1)", "Nativo/Bilingüe (C2)"
+                ]
+                
+                # Verificar si ya se agregaron idiomas
+                languages_added = st.session_state.get("languages_added", False)
+                
+                if not languages_added:
+                    n_lang_pdf = st.number_input(
+                        "Cantidad de idiomas adicionales",
+                        min_value=0,
+                        max_value=10,
+                        value=0,
+                        step=1,
+                        key="n_lang_pdf"
+                    )
+                    
+                    languages_pdf = []
+                    for i in range(int(n_lang_pdf)):
+                        st.markdown(f"**Idioma {i+1}**")
+                        col_idioma, col_nivel = st.columns(2)
+                        
+                        with col_idioma:
+                            idioma = st.selectbox(
+                                f"Idioma {i+1}",
+                                idiomas_disponibles,
+                                key=f"idioma_pdf_{i}",
+                            )
+                            
+                            if idioma == "Otro":
+                                idioma = st.text_input(
+                                    f"Especificar idioma {i+1}",
+                                    key=f"idioma_pdf_otro_{i}",
+                                    placeholder="Ej: Catalán, Euskera, etc."
+                                )
+                        
+                        with col_nivel:
+                            nivel = st.selectbox(
+                                f"Nivel {i+1}",
+                                niveles_idioma,
+                                key=f"nivel_pdf_{i}",
+                            )
+                        
+                        if idioma and nivel:
+                            languages_pdf.append(f"{idioma}: {nivel}")
+                    
+                    # Botones de acción
+                    col_add, col_skip = st.columns(2)
+                    
+                    with col_add:
+                        if languages_pdf and st.button("Agregar idiomas al CV"):
+                            languages_text = "\n\n**Idiomas**\n" + "\n".join(languages_pdf)
+                            st.session_state["pdf_text_clean"] += languages_text
+                            st.session_state["languages_added"] = True
+                            st.session_state["show_success_languages"] = True
+                            st.rerun()
+                    
+                    with col_skip:
+                        if st.button("➡️ Omitir idiomas"):
+                            st.session_state["languages_added"] = True
+                            st.session_state["show_info_skip_languages"] = True
+                            st.rerun()
+                
+                # Mostrar mensajes después del rerun
+                if st.session_state.get("show_success_languages"):
+                    st.success("✅ Idiomas agregados correctamente al CV base.")
+                    st.session_state["show_success_languages"] = False
+                
+                if st.session_state.get("show_info_skip_languages"):
+                    st.info("Idiomas omitidos. Ahora puedes generar el CV Maestro.")
+                    st.session_state["show_info_skip_languages"] = False
+
+            # ------------------------------------------------------------------
+            # Generar CV Maestro si existe formación procesada O si fue omitida Y idiomas procesados/omitidos
+            # ------------------------------------------------------------------
+            if st.session_state.get("studies_text_clean") is not None and st.session_state.get("languages_added", False):
 
                 st.markdown("### 3) Generar CV Maestro con IA")
 
@@ -1004,6 +1106,61 @@ def main():
             height=100,
         )
 
+        # ----------------- Idiomas -----------------
+        st.markdown("#### Idiomas")
+        n_lang = st.number_input(
+            "Cantidad de idiomas a incluir",
+            min_value=0,
+            max_value=10,
+            value=0,
+            step=1,
+        )
+
+        # Listas de idiomas y niveles
+        idiomas_disponibles = [
+            "Español", "Inglés", "Portugués", "Francés", "Italiano", "Alemán", 
+            "Chino (Mandarín)", "Japonés", "Coreano", "Árabe", "Ruso", "Holandés", 
+            "Sueco", "Noruego", "Danés", "Finlandés", "Polaco", "Checo", "Húngaro", 
+            "Griego", "Turco", "Hindi", "Tailandés", "Vietnamita", "Otro"
+        ]
+        
+        niveles_idioma = [
+            "Básico (A1)", "Elemental (A2)", "Intermedio (B1)", 
+            "Intermedio Alto (B2)", "Avanzado (C1)", "Nativo/Bilingüe (C2)"
+        ]
+
+        languages = []
+        for i in range(int(n_lang)):
+            st.markdown(f"**Idioma {i+1}**")
+            col_idioma, col_nivel = st.columns(2)
+            
+            with col_idioma:
+                idioma = st.selectbox(
+                    f"Idioma {i+1}",
+                    idiomas_disponibles,
+                    key=f"idioma_{i}",
+                )
+                
+                # Si selecciona "Otro", permitir entrada manual
+                if idioma == "Otro":
+                    idioma = st.text_input(
+                        f"Especificar idioma {i+1}",
+                        key=f"idioma_otro_{i}",
+                        placeholder="Ej: Catalán, Euskera, etc."
+                    )
+            
+            with col_nivel:
+                nivel = st.selectbox(
+                    f"Nivel {i+1}",
+                    niveles_idioma,
+                    key=f"nivel_{i}",
+                )
+            
+            languages.append({
+                "language": idioma,
+                "level": nivel,
+            })
+
         submitted = st.button("Validar y continuar")
         
         # Mostrar sugerencia si hay datos mínimos
@@ -1107,6 +1264,13 @@ def main():
             if not is_valid:
                 errors.append(f"❌ {error_msg}")
             
+            # Validar idiomas
+            for i, lang in enumerate(languages, 1):
+                if lang.get("language") and lang.get("language") != "Otro":
+                    is_valid, error_msg = validate_text_length(lang["language"], 0, 50, f"Idioma {i}")
+                    if not is_valid:
+                        errors.append(f"❌ {error_msg}")
+            
             # Validar contenido mínimo (flexible para perfiles junior)
             has_experience = any(exp.get("role") and exp.get("company") and exp.get("description") for exp in experiences)
             has_education = any(edu.get("degree") and edu.get("institution") for edu in educations)
@@ -1169,6 +1333,14 @@ def main():
                         for proj in projects
                     ],
                     "skills": sanitize_text(skills),
+                    "languages": [
+                        {
+                            "language": sanitize_text(lang.get("language", "")),
+                            "level": sanitize_text(lang.get("level", "")),
+                        }
+                        for lang in languages
+                        if lang.get("language") and lang.get("level")
+                    ],
                 }
 
                 cv_base_text = build_cv_text_from_form(form_data)
@@ -1180,6 +1352,7 @@ def main():
                 st.session_state["cv_master"] = None
                 st.session_state["linkedin_profile"] = None
                 st.session_state["cv_target"] = None
+                st.session_state["languages_added"] = True  # Marcar idiomas como procesados en formulario
                 st.session_state["show_success_form"] = True
                 st.rerun()
         

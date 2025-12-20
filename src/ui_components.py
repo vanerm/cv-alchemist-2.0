@@ -90,15 +90,20 @@ def create_sidebar():
         # Progress Tracker
         st.markdown("### 📍 Progreso")
         
-        # Verificar estado de formación
+        # Verificar estado de formación e idiomas
         studies_state = st.session_state.get("studies_text_clean")
         has_training_content = studies_state is not None and studies_state != ""
         training_skipped = studies_state == ""
+        
+        languages_added = st.session_state.get("languages_added", False)
+        languages_skipped = languages_added and "**Idiomas**" not in st.session_state.get("pdf_text_clean", "")
+        languages_completed = languages_added and "**Idiomas**" in st.session_state.get("pdf_text_clean", "")
         
         # Definir pasos con estados especiales
         steps = [
             ("1️⃣ Cargar/Crear CV", st.session_state.get("pdf_text_clean") is not None, False),
             ("2️⃣ Formación (opcional)", has_training_content, training_skipped),
+            ("🌍 Idiomas (opcional)", languages_completed, languages_skipped),
             ("3️⃣ CV Maestro", st.session_state.get("cv_master") is not None, False),
             ("4️⃣ Perfil LinkedIn", st.session_state.get("linkedin_profile") is not None, False),
             ("5️⃣ CV Target", st.session_state.get("cv_target") is not None, False),
@@ -159,11 +164,13 @@ def create_sidebar():
             st.markdown("""
                 **Pasos básicos:**
                 1. Sube tu CV o créalo desde cero
-                2. Genera el CV Maestro
-                3. Crea perfil LinkedIn (opcional)
-                4. Genera CV Target para un puesto
-                5. Analiza compatibilidad ATS
-                6. Descarga los PDFs
+                2. Agrega formación adicional (opcional)
+                🌍 Agrega idiomas (opcional)
+                3. Genera el CV Maestro
+                4. Crea perfil LinkedIn (opcional)
+                5. Genera CV Target para un puesto
+                6. Analiza compatibilidad ATS
+                7. Descarga los PDFs
             """)
         
         with st.expander("🎨 Templates"):

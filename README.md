@@ -240,11 +240,13 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 - **Educación**: Incluye hasta 10 estudios con opción "En curso"
 - **Proyectos**: Destaca hasta 10 proyectos relevantes con enlaces
 - **Habilidades**: Lista tus competencias técnicas y blandas
+- **Idiomas**: Sección completa con 25+ idiomas y niveles estándar (A1-C2)
 - **Validación de datos**: Regex para email, teléfono, URLs y sanitización de texto
 - **Selectores inteligentes**: Países y ciudades predefinidas para Latinoamérica y España
 
 ### 🆕 Características Comunes (Ambas Opciones)
 - **Agregar formación**: Sube PDFs de cursos/certificaciones (opcional)
+- **Agregar idiomas**: Sección completa con 25+ idiomas y niveles MCER (A1-C2)
 - **Generación con IA**: CV Maestro integrando toda la información
 - **Perfil LinkedIn**: Contenido optimizado para redes profesionales
 - **CV Target**: Personalización para puestos específicos
@@ -257,6 +259,14 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 - **Integración con CV base**: La IA combina la nueva formación con tu experiencia existente
 - **Validación de contenido**: Verificación de que los PDFs contienen información relevante
 - **Procesamiento contextual**: Mantiene coherencia entre formación previa y nueva
+
+### 🌍 Sistema de Idiomas Profesional
+- **25+ idiomas disponibles**: Español, Inglés, Portugués, Francés, Italiano, Alemán, Chino, Japonés, Árabe, Ruso, y más
+- **Niveles estándar MCER**: Desde Básico (A1) hasta Nativo/Bilingüe (C2)
+- **Opción personalizada**: Campo "Otro" para idiomas no listados (catalán, euskera, etc.)
+- **Integración dual**: Disponible tanto en formulario manual como en flujo de PDF
+- **Validación robusta**: Sanitización y validación de longitud
+- **Formato ATS-friendly**: Estructura "Idioma: Nivel" optimizada para sistemas de filtrado
 
 ### 🤖 Sistema de Selección de Modelo de IA
 - **Selector inteligente en sidebar**: 
@@ -427,6 +437,9 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 - [x] Validación inclusiva para perfiles junior sin experiencia previa
 - [x] Corrección de generación de PDFs para mostrar información de contacto completa
 - [x] Prompts anti-alucinaciones reforzados para evitar inventar formación técnica
+- [x] Sistema completo de idiomas con 25+ opciones y niveles MCER (A1-C2)
+- [x] Integración de idiomas en ambos flujos (PDF y formulario manual)
+- [x] Optimización de espaciado en templates para mejor uso del espacio
 
 ---
 
