@@ -293,9 +293,9 @@ Ambas opciones siguen la misma estructura de 6 pasos:
 - **Moderno**: Balance perfecto entre diseño y parseabilidad (ATS ⭐⭐⭐⭐)
   - Ideal para: Tech, Startups, Ingeniería, Data Science
   - Características: Tipografía moderna, colores sutiles, iconos minimalistas
-- **Minimalista**: Espaciado generoso y limpieza visual (ATS ⭐⭐⭐⭐)
+- **Minimalista**: Limpio y elegante (ATS ⭐⭐⭐⭐)
   - Ideal para: Diseño, UX/UI, Arquitectura, Creatividad
-  - Características: Mucho espacio en blanco, tipografía elegante, estructura clara
+  - Características: Espaciado equilibrado, tipografía elegante, estructura clara
 - **Creativo**: Más visual y diferenciado (ATS ⭐⭐⭐)
   - Ideal para: Marketing, Publicidad, Arte, Medios
   - Características: Colores vibrantes, elementos gráficos, layout innovador

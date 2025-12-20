@@ -84,7 +84,7 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Heading1'],
         fontSize=tmpl.font_sizes['name'],
         textColor=tmpl.colors['primary'],
-        spaceAfter=4,
+        spaceAfter=3,
         spaceBefore=0,
         alignment=TA_CENTER,
         fontName=tmpl.fonts['bold']
@@ -96,7 +96,7 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Normal'],
         fontSize=tmpl.font_sizes['title'],
         textColor=tmpl.colors.get('accent', tmpl.colors['primary']),
-        spaceAfter=12,
+        spaceAfter=8,
         alignment=TA_CENTER,
         fontName=tmpl.fonts['main']
     ))
@@ -107,7 +107,7 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Normal'],
         fontSize=tmpl.font_sizes['contact'],
         textColor=tmpl.colors['secondary'],
-        spaceAfter=16,
+        spaceAfter=12,
         alignment=TA_CENTER,
         fontName=tmpl.fonts['main']
     ))
@@ -118,8 +118,8 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Heading2'],
         fontSize=tmpl.font_sizes['section'],
         textColor=tmpl.colors.get('accent', tmpl.colors['primary']),
-        spaceAfter=8,
-        spaceBefore=14,
+        spaceAfter=6,
+        spaceBefore=10,
         alignment=TA_LEFT,
         fontName=tmpl.fonts['bold'],
         borderPadding=(0, 0, 4, 0)
@@ -131,8 +131,8 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Normal'],
         fontSize=tmpl.font_sizes['subheading'],
         textColor=tmpl.colors['primary'],
-        spaceAfter=3,
-        spaceBefore=6,
+        spaceAfter=2,
+        spaceBefore=4,
         alignment=TA_LEFT,
         fontName=tmpl.fonts['bold']
     ))
@@ -143,7 +143,7 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Normal'],
         fontSize=tmpl.font_sizes['secondary'],
         textColor=tmpl.colors['secondary'],
-        spaceAfter=4,
+        spaceAfter=3,
         alignment=TA_LEFT,
         fontName=tmpl.fonts['main']
     ))
@@ -154,10 +154,10 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Normal'],
         fontSize=tmpl.font_sizes['body'],
         textColor=tmpl.colors['text'],
-        spaceAfter=6,
+        spaceAfter=4,
         alignment=TA_JUSTIFY,
         fontName=tmpl.fonts['main'],
-        leading=14
+        leading=12
     ))
     
     # Estilo para bullets
@@ -166,11 +166,12 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
         parent=styles['Normal'],
         fontSize=tmpl.font_sizes['body'],
         textColor=tmpl.colors['text'],
-        spaceAfter=4,
+        spaceAfter=3,
         alignment=TA_LEFT,
         fontName=tmpl.fonts['main'],
         leftIndent=12,
-        bulletIndent=0
+        bulletIndent=0,
+        leading=12
     ))
     
     story = []
@@ -267,7 +268,7 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
             if current_section:
                 story.extend(current_section)
                 current_section = []
-            story.append(Spacer(1, 0.08*inch))
+            story.append(Spacer(1, 0.05*inch))
             continue
         
         # Detectar sección (título con **)
@@ -281,7 +282,7 @@ def generate_pdf(content: str, title: str = "CV", template: str = "modern") -> b
             section_title = line.strip('*').strip()
             section_title = escape_html(section_title)
             
-            story.append(Spacer(1, 0.05*inch))
+            story.append(Spacer(1, 0.03*inch))
             story.append(Paragraph(section_title, styles['SectionHeading']))
             if tmpl.use_dividers:
                 story.append(create_divider_line(template=tmpl, section=True))
